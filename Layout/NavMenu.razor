@@ -1,0 +1,105 @@
+﻿<!-- Contenedor superior del menú de navegación -->
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">FrontBlazor</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<!-- Contenedor principal del menú de navegación -->
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <!-- Home -->
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <!-- Counter -->
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+
+        <!-- Weather -->
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+
+        <!-- Opciones del sistema -->
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="usuarios">
+                <span class="bi bi-person-fill" aria-hidden="true"></span> Usuarios
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="secciones">
+                <span class="bi bi-folder-fill" aria-hidden="true"></span> Secciones
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="subsecciones">
+                <span class="bi bi-folder2-open" aria-hidden="true"></span> Subsecciones
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="fuentes">
+                <span class="bi bi-lightbulb-fill" aria-hidden="true"></span> Fuentes
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="unidadmedicion">
+                <span class="bi bi-rulers" aria-hidden="true"></span> Unidades de Medición
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tipoindicador">
+                <span class="bi bi-graph-up" aria-hidden="true"></span> Tipo de Indicador
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="represenvisuals">
+                <span class="bi bi-bar-chart-fill" aria-hidden="true"></span> Representaciones Visuales
+            </NavLink>
+        </div>
+
+        <!-- Opciones adicionales agregadas -->
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="roles">
+                <span class="bi bi-person-badge-fill" aria-hidden="true"></span> Roles
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="sentidos">
+                <span class="bi bi-compass-fill" aria-hidden="true"></span> Sentido
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="tipoactor">
+                <span class="bi bi-people-fill" aria-hidden="true"></span> Tipo de Actor
+            </NavLink>
+        </div>
+
+    </nav>
+</div>
+
+<!-- Código C# -->
+@code {
+    private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+}
