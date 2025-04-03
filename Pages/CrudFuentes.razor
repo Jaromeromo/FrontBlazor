@@ -327,7 +327,7 @@
 
     private void EditarFuente(Dictionary<string, object> fuente)
     {
-        fuenteParaEditar = fuente;
+        fuenteParaEditar = fuente; // Usar la referencia en lugar de clonar
         idFuenteEditar = ObtenerValor(fuente, "id");
         nombreFuenteEditar = ObtenerValor(fuente, "nombre");
         mostrarModalEditar = true;
@@ -335,43 +335,37 @@
     }
 
     private async Task ActualizarFuente()
+{
+    if (fuenteParaEditar == null || string.IsNullOrEmpty(nombreFuenteEditar))
     {
-        if (fuenteParaEditar == null || string.IsNullOrEmpty(nombreFuenteEditar))
-        {
-            errorMensaje = "El nombre de la fuente es obligatorio.";
-            return;
-        }
-
-        var datosFuenteActualizada = new Dictionary<string, object>
-        {
-            { "id", idFuenteEditar },
-            { "nombre", nombreFuenteEditar }
-        };
-
-        bool resultado = await servicioEntidad.ActualizarAsync(
-            "proyecto",
-            "fuente",
-            "id",
-            idFuenteEditar,
-            datosFuenteActualizada
-        );
-
-        if (resultado)
-        {
-            int indice = fuentes.IndexOf(fuenteParaEditar);
-            if (indice >= 0)
-            {
-                fuentes[indice] = datosFuenteActualizada;
-                fuenteSeleccionada.Remove(fuenteParaEditar);
-                fuenteSeleccionada[datosFuenteActualizada] = false;
-            }
-            CerrarModalEditar();
-        }
-        else
-        {
-            errorMensaje = "Error al actualizar la fuente en la base de datos.";
-        }
+        errorMensaje = "El nombre de la fuente es obligatorio.";
+        return;
     }
+
+    // Eliminar el campo 'id' de los parámetros para que no se intente actualizar una columna de tipo identity
+    fuenteParaEditar.Remove("id");
+
+    // Actualizar solo los campos permitidos (en este caso, el 'nombre')
+    fuenteParaEditar["nombre"] = nombreFuenteEditar; // Modificar el diccionario original
+
+    bool resultado = await servicioEntidad.ActualizarAsync(
+        "proyecto",
+        "fuente",
+        "id",
+        idFuenteEditar,
+        fuenteParaEditar
+    );
+
+    if (resultado)
+    {
+        CerrarModalEditar();
+    }
+    else
+    {
+        errorMensaje = "Error al actualizar la fuente en la base de datos.";
+    }
+}
+
 
     private void EditarFuenteSeleccionada()
     {
@@ -504,5 +498,6 @@
         CerrarModalEliminarMultiples();
     }
 }
+
 
 

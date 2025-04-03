@@ -92,7 +92,7 @@
             <div class="modal-content">
                 <form @onsubmit="GuardarSeccion">
                     <div class="modal-header">
-                        <h4 class="modal-title">Agregar Fuente</h4>
+                        <h4 class="modal-title">Agregar Seccion</h4>
                         <button type="button" class="close" @onclick="CerrarModal">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -117,7 +117,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Consultar Fuente</h4>
+                    <h4 class="modal-title">Consultar Seccion</h4>
                     <button type="button" class="close" @onclick="CerrarModalConsulta">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -151,7 +151,7 @@
             <div class="modal-content">
                 <form @onsubmit="ActualizarSeccion">
                     <div class="modal-header">
-                        <h4 class="modal-title">Editar Fuente</h4>
+                        <h4 class="modal-title">Editar Seccion</h4>
                         <button type="button" class="close" @onclick="CerrarModalEditar">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -181,11 +181,11 @@
             <div class="modal-content">
                 <form @onsubmit="ConfirmarEliminarSeccion">
                     <div class="modal-header">
-                        <h4 class="modal-title">Eliminar Fuente</h4>
+                        <h4 class="modal-title">Eliminar Seccion</h4>
                         <button type="button" class="close" @onclick="CerrarModalEliminar">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>¿Está seguro de que desea eliminar esta fuente?</p>
+                        <p>¿Está seguro de que desea eliminar esta seccion?</p>
                         <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
                     </div>
                     <div class="modal-footer">
@@ -205,11 +205,11 @@
             <div class="modal-content">
                 <form @onsubmit="ConfirmarEliminarSeleccionados">
                     <div class="modal-header">
-                        <h4 class="modal-title">Eliminar Fuentes Seleccionadas</h4>
+                        <h4 class="modal-title">Eliminar Secciones Seleccionadas</h4>
                         <button type="button" class="close" @onclick="CerrarModalEliminarMultiples">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>¿Está seguro de que desea eliminar las fuentes seleccionadas?</p>
+                        <p>¿Está seguro de que desea eliminar las secciones seleccionadas?</p>
                         <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
                     </div>
                     <div class="modal-footer">
@@ -326,51 +326,41 @@
 
     private void EditarSeccion(Dictionary<string, object> seccion)
     {
-        seccionParaEditar = seccion;
+        seccionParaEditar = seccion; // Usar la referencia en lugar de clonar
         idSeccionEditar = ObtenerValor(seccion, "id");
         nombreSeccionEditar = ObtenerValor(seccion, "nombre");
         mostrarModalEditar = true;
         StateHasChanged();
     }
 
-    private async Task ActualizarSeccion()
+private async Task ActualizarSeccion()
+{
+    if (seccionParaEditar == null || string.IsNullOrEmpty(nombreSeccionEditar))
     {
-        if (seccionParaEditar == null || string.IsNullOrEmpty(nombreSeccionEditar))
-        {
-            errorMensaje = "El nombre de la sección es obligatorio.";
-            return;
-        }
+        errorMensaje = "El nombre de la sección es obligatorio.";
+        return;
+    }
 
-        var datosSeccionActualizada = new Dictionary<string, object>
-        {
-            { "id", idSeccionEditar },
-            { "nombre", nombreSeccionEditar }
-        };
+    seccionParaEditar["nombre"] = nombreSeccionEditar; // Modificar el diccionario original
 
-        bool resultado = await servicioEntidad.ActualizarAsync(
-            "proyecto",
-            "seccion",
-            "id",
-            idSeccionEditar,
-            datosSeccionActualizada
-        );
+    bool resultado = await servicioEntidad.ActualizarAsync(
+        "proyecto",
+        "seccion",
+        "id",
+        idSeccionEditar,
+        seccionParaEditar
+    );
 
         if (resultado)
         {
-            int indice = secciones.IndexOf(seccionParaEditar);
-            if (indice >= 0)
-            {
-                secciones[indice] = datosSeccionActualizada;
-                seccionSeleccionada.Remove(seccionParaEditar);
-                seccionSeleccionada[datosSeccionActualizada] = false;
-            }
-            CerrarModalEditar();
+        CerrarModalEditar();
         }
         else
         {
-            errorMensaje = "Error al actualizar la sección en la base de datos.";
-        }
+        errorMensaje = "Error al actualizar la sección en la base de datos.";
     }
+}
+
 
     private void EditarSeccionSeleccionada()
     {
