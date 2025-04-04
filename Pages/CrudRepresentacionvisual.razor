@@ -331,7 +331,7 @@
         return diccionario.TryGetValue(clave, out var valor) ? valor?.ToString() ?? "" : "";
     }
 
-    private void EditarRepresenvisual(Dictionary<string, object> represenvisual)
+        private void EditarRepresenvisual(Dictionary<string, object> represenvisual)
     {
         represenvisualParaEditar = represenvisual;
         idRepresenvisualEditar = ObtenerValor(represenvisual, "id");
@@ -340,44 +340,43 @@
         StateHasChanged();
     }
 
-    private async Task ActualizarRepresenvisual()
+ private async Task ActualizarRepresenvisual()
+{
+    // Verificación de datos de entrada
+    if (represenvisualParaEditar == null || string.IsNullOrEmpty(nombreRepresenvisualEditar))
     {
-        if (represenvisualParaEditar == null || string.IsNullOrEmpty(nombreRepresenvisualEditar))
-        {
-            errorMensaje = "El nombre de la representación visual es obligatorio.";
-            return;
-        }
-
-        var datosRepresenvisualActualizada = new Dictionary<string, object>
-        {
-            { "id", idRepresenvisualEditar },
-            { "nombre", nombreRepresenvisualEditar }
-        };
-
-        bool resultado = await servicioEntidad.ActualizarAsync(
-            "proyecto",
-            "represenvisual",
-            "id",
-            idRepresenvisualEditar,
-            datosRepresenvisualActualizada
-        );
-
-        if (resultado)
-        {
-            int indice = represenvisuales.IndexOf(represenvisualParaEditar);
-            if (indice >= 0)
-            {
-                represenvisuales[indice] = datosRepresenvisualActualizada;
-                represenvisualSeleccionada.Remove(represenvisualParaEditar);
-                represenvisualSeleccionada[datosRepresenvisualActualizada] = false;
-            }
-            CerrarModalEditar();
-        }
-        else
-        {
-            errorMensaje = "Error al actualizar la representación visual en la base de datos.";
-        }
+        errorMensaje = "El nombre de la representación visual es obligatorio.";
+        return;
     }
+
+    // Eliminar el campo 'id' del diccionario para evitar actualizar la columna identity
+    represenvisualParaEditar.Remove("id");
+
+    // Actualizar solo los campos permitidos, en este caso, el 'nombre'
+    represenvisualParaEditar["nombre"] = nombreRepresenvisualEditar; // Modificar el diccionario original
+
+    // Llamada al servicio de actualización
+    bool resultado = await servicioEntidad.ActualizarAsync(
+        "proyecto",           // Nombre del proyecto
+        "represenvisual",     // Nombre de la entidad en la base de datos
+        "id",                 // Nombre del campo clave primaria
+        idRepresenvisualEditar,  // ID de la representación visual que estamos actualizando
+        represenvisualParaEditar // Diccionario con los campos a actualizar
+    );
+
+    // Verificar si la actualización fue exitosa
+    if (resultado)
+    {
+        // Actualización exitosa, cerrar el modal de edición
+        CerrarModalEditar();
+    }
+    else
+    {
+        // En caso de error
+        errorMensaje = "Error al actualizar la representación visual en la base de datos.";
+    }
+}
+
 
     private void EditarRepresenvisualSeleccionada()
     {

@@ -336,42 +336,41 @@ private void EditarSubseccion(Dictionary<string, object> subseccion)
 
 private async Task ActualizarSubseccion()
 {
+    // Verificación de datos de entrada
     if (subseccionParaEditar == null || string.IsNullOrEmpty(nombreSubseccionEditar))
     {
         errorMensaje = "El nombre de la subsección es obligatorio.";
         return;
     }
 
-    var datosSubseccionActualizada = new Dictionary<string, object>
-    {
-        { "id", idSubseccionEditar },
-        { "nombre", nombreSubseccionEditar }
-    };
+    // Eliminar el campo 'id' del diccionario para evitar actualizar la columna identity
+    subseccionParaEditar.Remove("id");
 
+    // Actualizar solo los campos permitidos, en este caso, el 'nombre'
+    subseccionParaEditar["nombre"] = nombreSubseccionEditar; // Modificar el diccionario original
+
+    // Llamada al servicio de actualización
     bool resultado = await servicioEntidad.ActualizarAsync(
-        "proyecto",
-        "subseccion",
-        "id",
-        idSubseccionEditar,
-        datosSubseccionActualizada
+        "proyecto",          // Nombre del proyecto
+        "subseccion",        // Nombre de la entidad en la base de datos
+        "id",                // Nombre del campo clave primaria
+        idSubseccionEditar,  // ID de la subsección que estamos actualizando
+        subseccionParaEditar // Diccionario con los campos a actualizar
     );
 
+    // Verificar si la actualización fue exitosa
     if (resultado)
     {
-        int indice = subsecciones.IndexOf(subseccionParaEditar);
-        if (indice >= 0)
-        {
-            subsecciones[indice] = datosSubseccionActualizada;
-            subseccionSeleccionada.Remove(subseccionParaEditar);
-            subseccionSeleccionada[datosSubseccionActualizada] = false;
-        }
+        // Actualización exitosa, cerrar el modal de edición
         CerrarModalEditar();
     }
     else
     {
+        // En caso de error
         errorMensaje = "Error al actualizar la subsección en la base de datos.";
     }
 }
+
 
 private void EditarSubseccionSeleccionada()
 {

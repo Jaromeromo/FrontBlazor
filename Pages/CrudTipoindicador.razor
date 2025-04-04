@@ -334,44 +334,42 @@
         StateHasChanged();
     }
 
-    private async Task ActualizarTipoIndicador()
+ private async Task ActualizarTipoIndicador()
+{
+    // Verificación de datos de entrada
+    if (tipoIndicadorParaEditar == null || string.IsNullOrEmpty(nombreTipoIndicadorEditar))
     {
-        if (tipoIndicadorParaEditar == null || string.IsNullOrEmpty(nombreTipoIndicadorEditar))
-        {
-            errorMensaje = "El nombre del tipo de indicador es obligatorio.";
-            return;
-        }
-
-        var datosTipoIndicadorActualizado = new Dictionary<string, object>
-        {
-            { "id", idTipoIndicadorEditar },
-            { "nombre", nombreTipoIndicadorEditar }
-        };
-
-        bool resultado = await servicioEntidad.ActualizarAsync(
-            "proyecto",
-            "tipoIndicador",
-            "id",
-            idTipoIndicadorEditar,
-            datosTipoIndicadorActualizado
-        );
-
-        if (resultado)
-        {
-            int indice = tiposIndicador.IndexOf(tipoIndicadorParaEditar);
-            if (indice >= 0)
-            {
-                tiposIndicador[indice] = datosTipoIndicadorActualizado;
-                tipoIndicadorSeleccionado.Remove(tipoIndicadorParaEditar);
-                tipoIndicadorSeleccionado[datosTipoIndicadorActualizado] = false;
-            }
-            CerrarModalEditar();
-        }
-        else
-        {
-            errorMensaje = "Error al actualizar el tipo de indicador en la base de datos.";
-        }
+        errorMensaje = "El nombre del tipo de indicador es obligatorio.";
+        return;
     }
+
+    // Eliminar el campo 'id' del diccionario para evitar actualizar la columna identity
+    tipoIndicadorParaEditar.Remove("id");
+
+    // Actualizar solo el campo 'nombre' en el diccionario
+    tipoIndicadorParaEditar["nombre"] = nombreTipoIndicadorEditar;
+
+    // Llamada al servicio de actualización
+    bool resultado = await servicioEntidad.ActualizarAsync(
+        "proyecto",               // Nombre del proyecto
+        "tipoIndicador",          // Nombre de la entidad en la base de datos
+        "id",                     // Nombre del campo clave primaria
+        idTipoIndicadorEditar,    // ID del tipo de indicador que estamos actualizando
+        tipoIndicadorParaEditar   // Diccionario con los campos a actualizar
+    );
+
+    // Verificar si la actualización fue exitosa
+    if (resultado)
+    {
+        // Actualización exitosa, cerrar el modal de edición
+        CerrarModalEditar();
+    }
+    else
+    {
+        // En caso de error
+        errorMensaje = "Error al actualizar el tipo de indicador en la base de datos.";
+    }
+}
 
     private void EditarTipoIndicadorSeleccionado()
     {

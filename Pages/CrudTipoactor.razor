@@ -337,44 +337,43 @@
         StateHasChanged();
     }
 
-    private async Task ActualizarTipoActor()
+private async Task ActualizarTipoActor()
+{
+    // Verificación de datos de entrada
+    if (tipoActorParaEditar == null || string.IsNullOrEmpty(nombreTipoActorEditar))
     {
-        if (tipoActorParaEditar == null || string.IsNullOrEmpty(nombreTipoActorEditar))
-        {
-            errorMensaje = "El nombre del tipo de actor es obligatorio.";
-            return;
-        }
-
-        var datosTipoActorActualizado = new Dictionary<string, object>
-        {
-            { "id", idTipoActorEditar },
-            { "nombre", nombreTipoActorEditar }
-        };
-
-        bool resultado = await servicioEntidad.ActualizarAsync(
-            "proyecto",
-            "tipoActor",
-            "id",
-            idTipoActorEditar,
-            datosTipoActorActualizado
-        );
-
-        if (resultado)
-        {
-            int indice = tiposActor.IndexOf(tipoActorParaEditar);
-            if (indice >= 0)
-            {
-                tiposActor[indice] = datosTipoActorActualizado;
-                tipoActorSeleccionado.Remove(tipoActorParaEditar);
-                tipoActorSeleccionado[datosTipoActorActualizado] = false;
-            }
-            CerrarModalEditar();
-        }
-        else
-        {
-            errorMensaje = "Error al actualizar el tipo de actor en la base de datos.";
-        }
+        errorMensaje = "El nombre del actor es obligatorio.";
+        return;
     }
+
+    // Eliminar el campo 'id' del diccionario para evitar actualizar la columna identity
+    tipoActorParaEditar.Remove("id");
+
+    // Actualizar solo el campo 'nombre' en el diccionario
+    tipoActorParaEditar["nombre"] = nombreTipoActorEditar;
+
+    // Llamada al servicio de actualización
+    bool resultado = await servicioEntidad.ActualizarAsync(
+        "proyecto",           // Nombre del proyecto
+        "tipoactor",          // Nombre de la entidad en la base de datos
+        "id",                 // Nombre del campo clave primaria
+        idTipoActorEditar,    // ID del tipo de actor que estamos actualizando
+        tipoActorParaEditar   // Diccionario con los campos a actualizar
+    );
+
+    // Verificar si la actualización fue exitosa
+    if (resultado)
+    {
+        // Actualización exitosa, cerrar el modal de edición
+        CerrarModalEditar();
+    }
+    else
+    {
+        // En caso de error
+        errorMensaje = "Error al actualizar actor en la base de datos.";
+    }
+}
+
 
     private void EditarTipoActorSeleccionado()
     {

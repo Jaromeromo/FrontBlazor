@@ -353,44 +353,44 @@
         StateHasChanged();
     }
 
-    private async Task ActualizarUsuario()
+private async Task ActualizarUsuario()
+{
+    // Verificación de datos de entrada
+    if (usuarioParaEditar == null || string.IsNullOrEmpty(emailUsuarioEditar) || string.IsNullOrEmpty(passwordUsuarioEditar))
     {
-        if (usuarioParaEditar == null || string.IsNullOrEmpty(emailUsuarioEditar) || string.IsNullOrEmpty(passwordUsuarioEditar))
-        {
-            errorMensaje = "El email y la contraseña del usuario son obligatorios.";
-            return;
-        }
-
-        var datosUsuarioActualizado = new Dictionary<string, object>
-        {
-            { "email", emailUsuarioEditar },
-            { "password", passwordUsuarioEditar }
-        };
-
-        bool resultado = await servicioEntidad.ActualizarAsync(
-            "proyecto",
-            "usuario",
-            "email",
-            emailUsuarioEditar,
-            datosUsuarioActualizado
-        );
-
-        if (resultado)
-        {
-            int indice = usuarios.IndexOf(usuarioParaEditar);
-            if (indice >= 0)
-            {
-                usuarios[indice] = datosUsuarioActualizado;
-                usuarioSeleccionado.Remove(usuarioParaEditar);
-                usuarioSeleccionado[datosUsuarioActualizado] = false;
-            }
-            CerrarModalEditar();
-        }
-        else
-        {
-            errorMensaje = "Error al actualizar el usuario en la base de datos.";
-        }
+        errorMensaje = "El email y la contraseña del usuario son obligatorios.";
+        return;
     }
+
+    // Eliminar el campo 'email' del diccionario para evitar actualizar una columna única
+    usuarioParaEditar.Remove("email");
+
+    // Actualizar solo los campos permitidos: 'email' y 'password'
+    usuarioParaEditar["email"] = emailUsuarioEditar;
+    usuarioParaEditar["password"] = passwordUsuarioEditar;
+
+    // Llamada al servicio de actualización
+    bool resultado = await servicioEntidad.ActualizarAsync(
+        "proyecto",              // Nombre del proyecto
+        "usuario",               // Nombre de la entidad en la base de datos
+        "email",                 // El campo clave primaria (en este caso, el email)
+        emailUsuarioEditar,      // Email del usuario que estamos actualizando
+        usuarioParaEditar        // Diccionario con los campos a actualizar
+    );
+
+    // Verificar si la actualización fue exitosa
+    if (resultado)
+    {
+        // Actualización exitosa, cerrar el modal de edición
+        CerrarModalEditar();
+    }
+    else
+    {
+        // En caso de error
+        errorMensaje = "Error al actualizar el usuario en la base de datos.";
+    }
+}
+
 
     private void EditarUsuarioSeleccionado()
     {
