@@ -312,6 +312,7 @@
         {
             tiposIndicador.Add(nuevoTipoIndicador);
             tipoIndicadorSeleccionado[nuevoTipoIndicador] = false;
+            await CargarTiposIndicador();
             CerrarModal();
         }
         else
@@ -362,6 +363,7 @@
     if (resultado)
     {
         // Actualización exitosa, cerrar el modal de edición
+        await CargarTiposIndicador();
         CerrarModalEditar();
     }
     else
