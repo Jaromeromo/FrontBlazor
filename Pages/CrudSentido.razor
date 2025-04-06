@@ -311,6 +311,7 @@
         {
             sentidos.Add(nuevoSentido);
             sentidoSeleccionado[nuevoSentido] = false;
+            await CargarSentidos();
             CerrarModal();
         }
         else
@@ -361,6 +362,7 @@
     if (resultado)
     {
         // Actualización exitosa, cerrar el modal de edición
+        await CargarSentidos();
         CerrarModalEditar();
     }
     else
