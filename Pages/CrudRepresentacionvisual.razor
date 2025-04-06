@@ -318,6 +318,7 @@
         {
             represenvisuales.Add(nuevaRepresenvisual);
             represenvisualSeleccionada[nuevaRepresenvisual] = false;
+            await CargarRepresenvisuales();
             CerrarModal();
         }
         else
@@ -368,6 +369,7 @@
     if (resultado)
     {
         // Actualización exitosa, cerrar el modal de edición
+        await CargarRepresenvisuales();
         CerrarModalEditar();
     }
     else
