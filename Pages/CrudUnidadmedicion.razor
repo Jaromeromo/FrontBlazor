@@ -312,6 +312,7 @@
         {
             unidadesMedicion.Add(nuevaUnidadMedicion);
             unidadMedicionSeleccionada[nuevaUnidadMedicion] = false;
+            await CargarUnidadesMedicion();
             CerrarModal();
         }
         else
@@ -362,6 +363,7 @@
     if (resultado)
     {
         // Actualización exitosa, cerrar el modal de edición
+        await CargarUnidadesMedicion();
         CerrarModalEditar();
     }
     else
