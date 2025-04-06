@@ -312,6 +312,7 @@
         {
             fuentes.Add(nuevaFuente);
             fuenteSeleccionada[nuevaFuente] = false;
+            await CargarFuentes();
             CerrarModal();
         }
         else
@@ -358,6 +359,7 @@
 
     if (resultado)
     {
+        await CargarFuentes();
         CerrarModalEditar();
     }
     else
