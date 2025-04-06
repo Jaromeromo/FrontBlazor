@@ -315,6 +315,7 @@
         {
             tiposActor.Add(nuevoTipoActor);
             tipoActorSeleccionado[nuevoTipoActor] = false;
+            await CargarTiposActor();
             CerrarModal();
         }
         else
@@ -365,6 +366,7 @@ private async Task ActualizarTipoActor()
     if (resultado)
     {
         // Actualización exitosa, cerrar el modal de edición
+        await CargarTiposActor();
         CerrarModalEditar();
     }
     else
