@@ -331,6 +331,7 @@
         {
             usuarios.Add(nuevoUsuario);
             usuarioSeleccionado[nuevoUsuario] = false;
+            await CargarUsuarios();
             CerrarModal();
         }
         else
@@ -382,6 +383,7 @@ private async Task ActualizarUsuario()
     if (resultado)
     {
         // Actualización exitosa, cerrar el modal de edición
+        await CargarUsuarios();
         CerrarModalEditar();
     }
     else
