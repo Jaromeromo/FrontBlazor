@@ -1,0 +1,526 @@
+@page "/FuentesPorIndicador"
+@using System.Collections.Generic
+@using System.Threading.Tasks
+@using Services
+@inject ServicioEntidad servicioEntidad
+@inject NavigationManager navegacionManager
+
+<div class="container-xl">
+    <div class="table-responsive">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Administrar <b>Fuentes por Indicador</b></h2>
+                    </div>
+                    <div class="col-sm-6">
+                        <button class="btn btn-info btn-sm" @onclick="() => mostrarModalConsulta = true">
+                            <i class="material-icons">&#xE8B6;</i> <span>Consultar</span>
+                        </button>
+
+                        <button class="btn btn-danger btn-sm" @onclick="MostrarModalEliminarMultiples">
+                            <i class="material-icons">&#xE15C;</i> <span>Eliminar</span>
+                        </button>
+
+                        <button class="btn btn-success btn-sm" @onclick="AbrirModalGuardar">
+                            <i class="material-icons">&#xE147;</i> <span>Agregar</span>
+                        </button>
+
+                        <button class="btn btn-info btn-sm" @onclick="() => EditarRelacionSeleccionada()">
+                            <i class="material-icons">&#xE254;</i> <span>Editar Seleccionado</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            @if (cargando)
+            {
+                <p><em>Cargando...</em></p>
+            }
+            else if (relaciones == null || relaciones.Count == 0)
+            {
+                <p>No hay relaciones Fuente-Indicador disponibles.</p>
+            }
+            else
+            {
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <span class="custom-checkbox">
+                                    <input type="checkbox" @bind="@seleccionarTodos">
+                                    <label></label>
+                                </span>
+                            </th>
+                            <th>ID Fuente</th>
+                            <th>ID Indicador</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var relacion in relaciones)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="custom-checkbox">
+                                        <input type="checkbox" @bind="@relacionesSeleccionadas[relacion]">
+                                        <label></label>
+                                    </span>
+                                </td>
+                                <td>@ObtenerValor(relacion, "fkidfuente")</td>
+                                <td>@ObtenerValor(relacion, "fkidindicador")</td>
+                                <td>
+                                    <a href="#" class="edit" @onclick="() => EditarRelacion(relacion)" @onclick:preventDefault>
+                                        <i class="material-icons" title="Editar">&#xE254;</i>
+                                    </a>
+                                    <a href="#" class="delete" @onclick="() => EliminarRelacion(relacion)"
+                                        @onclick:preventDefault>
+                                        <i class="material-icons" title="Eliminar">&#xE872;</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
+
+@if (mostrarModalGuardar)
+{
+   <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form @onsubmit="GuardarRelacion">
+                <div class="modal-header">
+                    <h4 class="modal-title">Agregar Relación Fuente-Indicador</h4>
+                    <button type="button" class="close" @onclick="CerrarModalGuardar">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>ID Fuente</label>
+                        <input type="number" class="form-control" @bind="idFuente" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ID Indicador</label>
+                        <input type="number" class="form-control" @bind="idIndicador" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModalGuardar">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+}
+
+@if (mostrarModalConsulta)
+{
+    <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Consultar Relación</h4>
+                    <button type="button" class="close" @onclick="CerrarModalConsulta">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>ID Fuente</label>
+                        <input type="number" class="form-control" @bind="idFuenteConsultar">
+                    </div>
+                    <div class="form-group">
+                        <label>ID Indicador</label>
+                        <input type="number" class="form-control" @bind="idIndicadorConsultar">
+                    </div>
+                    <button class="btn btn-primary mt-2" @onclick="ConsultarRelacion">Buscar</button>
+
+                    @if (relacionConsultada != null)
+                    {
+                        <hr>
+                        <div class="form-group">
+                            <label>ID Fuente</label>
+                            <input type="number" class="form-control" value="@idFuenteConsultar" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>ID Indicador</label>
+                            <input type="number" class="form-control" value="@idIndicadorConsultar" disabled>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModalConsulta">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalEditar)
+{
+    <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @onsubmit="ActualizarRelacion">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Editar Relación</h4>
+                        <button type="button" class="close" @onclick="CerrarModalEditar">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>ID Fuente Original</label>
+                            <input type="number" class="form-control" @bind="idFuenteOriginal" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>ID Indicador Original</label>
+                            <input type="number" class="form-control" @bind="idIndicadorOriginal" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Nuevo ID Fuente</label>
+                            <input type="number" class="form-control" @bind="idFuenteEditar" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Nuevo ID Indicador</label>
+                            <input type="number" class="form-control" @bind="idIndicadorEditar" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CerrarModalEditar">Cancelar</button>
+                        <button type="submit" class="btn btn-info">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+@if (mostrarModalEliminar)
+{
+    <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @onsubmit="ConfirmarEliminarRelacion">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Eliminar Relación</h4>
+                        <button type="button" class="close" @onclick="CerrarModalEliminar">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Está seguro de que desea eliminar esta relación Fuente-Indicador?</p>
+                        <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CerrarModalEliminar">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@if (mostrarModalEliminarMultiples)
+{
+    <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form @onsubmit="ConfirmarEliminarSeleccionados">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Eliminar Relaciones Seleccionadas</h4>
+                        <button type="button" class="close" @onclick="CerrarModalEliminarMultiples">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Está seguro de que desea eliminar las relaciones seleccionadas?</p>
+                        <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary"
+                            @onclick="CerrarModalEliminarMultiples">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    private List<Dictionary<string, object>> relaciones = new();
+    private Dictionary<Dictionary<string, object>, bool> relacionesSeleccionadas = new();
+    private bool cargando = true;
+    private bool mostrarModalGuardar = false;
+    private bool mostrarModalConsulta = false;
+    private bool mostrarModalEditar = false;
+    private bool mostrarModalEliminar = false;
+    private bool mostrarModalEliminarMultiples = false;
+    
+    private Dictionary<string, object> relacionAEliminar;
+    private Dictionary<string, object> relacionConsultada;
+
+    private int idFuente;
+    private int idIndicador;
+    private int idFuenteConsultar;
+    private int idIndicadorConsultar;
+    private int idFuenteEditar;
+    private int idIndicadorEditar;
+    private int idFuenteOriginal;
+    private int idIndicadorOriginal;
+
+    private bool seleccionarTodos
+    {
+        get => _seleccionarTodos;
+        set
+        {
+            _seleccionarTodos = value;
+            foreach (var relacion in relaciones)
+            {
+                relacionesSeleccionadas[relacion] = _seleccionarTodos;
+            }
+        }
+    }
+    private bool _seleccionarTodos = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarRelaciones();
+    }
+
+    private async Task CargarRelaciones()
+    {
+        cargando = true;
+
+        try
+        {
+            relaciones = await servicioEntidad.ObtenerTodosAsync("proyecto", "fuentesporindicador") ?? new();
+            relacionesSeleccionadas = relaciones.ToDictionary(r => r, r => false);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar relaciones: {ex.Message}");
+            relaciones = new();
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+    {
+        return diccionario.TryGetValue(clave, out var valor) ? valor?.ToString() ?? "" : "";
+    }
+
+    private void AbrirModalGuardar()
+    {
+        mostrarModalGuardar = true;
+        idFuente = 0;
+        idIndicador = 0;
+    }
+
+    private void CerrarModalGuardar()
+    {
+        mostrarModalGuardar = false;
+    }
+
+    private async Task GuardarRelacion()
+    {
+        try
+        {
+            var nuevaRelacion = new Dictionary<string, object>
+            {
+                { "fkidfuente", idFuente },
+                { "fkidindicador", idIndicador }
+            };
+
+            var resultado = await servicioEntidad.CrearAsync("proyecto", "fuentesporindicador", nuevaRelacion);
+
+            if (resultado)
+            {
+                await CargarRelaciones();
+                CerrarModalGuardar();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al guardar relación: {ex.Message}");
+        }
+    }
+
+    private async Task ConsultarRelacion()
+    {
+        try
+        {
+            // Para consultar una relación específica, necesitamos ambas claves primarias
+            var url = $"fkidfuente/{idFuenteConsultar}/fkidindicador/{idIndicadorConsultar}";
+            var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "fuentesporindicador", "fkidfuente", idFuenteConsultar.ToString());
+            
+            if (resultado != null && ObtenerValor(resultado, "fkidindicador") == idIndicadorConsultar.ToString())
+            {
+                relacionConsultada = resultado;
+            }
+            else
+            {
+                relacionConsultada = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al consultar relación: {ex.Message}");
+            relacionConsultada = null;
+        }
+    }
+
+    private void CerrarModalConsulta()
+    {
+        mostrarModalConsulta = false;
+        idFuenteConsultar = 0;
+        idIndicadorConsultar = 0;
+        relacionConsultada = null;
+    }
+
+    private void EditarRelacion(Dictionary<string, object> relacion)
+    {
+        idFuenteOriginal = int.Parse(ObtenerValor(relacion, "fkidfuente"));
+        idIndicadorOriginal = int.Parse(ObtenerValor(relacion, "fkidindicador"));
+        
+        idFuenteEditar = idFuenteOriginal;
+        idIndicadorEditar = idIndicadorOriginal;
+        
+        mostrarModalEditar = true;
+    }
+
+    private void EditarRelacionSeleccionada()
+    {
+        var relacionSeleccionada = relacionesSeleccionadas.FirstOrDefault(r => r.Value).Key;
+        if (relacionSeleccionada != null)
+        {
+            EditarRelacion(relacionSeleccionada);
+        }
+    }
+
+    private void CerrarModalEditar()
+    {
+        mostrarModalEditar = false;
+    }
+
+    private async Task ActualizarRelacion()
+    {
+        try
+        {
+            // Para actualizar una relación, primero debemos eliminar la existente y luego crear una nueva
+            var eliminado = await servicioEntidad.EliminarAsync(
+                "proyecto", 
+                "fuentesporindicador", 
+                "fkidfuente", 
+                idFuenteOriginal.ToString());
+
+            if (eliminado)
+            {
+                var nuevaRelacion = new Dictionary<string, object>
+                {
+                    { "fkidfuente", idFuenteEditar },
+                    { "fkidindicador", idIndicadorEditar }
+                };
+
+                var creado = await servicioEntidad.CrearAsync("proyecto", "fuentesporindicador", nuevaRelacion);
+                
+                if (creado)
+                {
+                    await CargarRelaciones();
+                    CerrarModalEditar();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al actualizar relación: {ex.Message}");
+        }
+    }
+
+    private void EliminarRelacion(Dictionary<string, object> relacion)
+    {
+        relacionAEliminar = relacion;
+        mostrarModalEliminar = true;
+    }
+
+    private void CerrarModalEliminar()
+    {
+        mostrarModalEliminar = false;
+        relacionAEliminar = null;
+    }
+
+    private async Task ConfirmarEliminarRelacion()
+    {
+        if (relacionAEliminar != null)
+        {
+            var idFuente = ObtenerValor(relacionAEliminar, "fkidfuente");
+            var idIndicador = ObtenerValor(relacionAEliminar, "fkidindicador");
+
+            try
+            {
+                var resultado = await servicioEntidad.EliminarAsync(
+                    "proyecto", 
+                    "fuentesporindicador", 
+                    "fkidfuente", 
+                    idFuente);
+
+                if (resultado)
+                {
+                    await CargarRelaciones();
+                    CerrarModalEliminar();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al eliminar relación: {ex.Message}");
+            }
+        }
+    }
+
+    private void MostrarModalEliminarMultiples()
+    {
+        if (relacionesSeleccionadas.Any(r => r.Value))
+        {
+            mostrarModalEliminarMultiples = true;
+        }
+    }
+
+    private void CerrarModalEliminarMultiples()
+    {
+        mostrarModalEliminarMultiples = false;
+    }
+
+    private async Task ConfirmarEliminarSeleccionados()
+    {
+        var relacionesParaEliminar = relacionesSeleccionadas
+            .Where(r => r.Value)
+            .Select(r => r.Key)
+            .ToList();
+
+        bool todosEliminados = true;
+
+        foreach (var relacion in relacionesParaEliminar)
+        {
+            var idFuente = ObtenerValor(relacion, "fkidfuente");
+
+            var resultado = await servicioEntidad.EliminarAsync(
+                "proyecto", 
+                "fuentesporindicador", 
+                "fkidfuente", 
+                idFuente);
+
+            if (!resultado)
+            {
+                todosEliminados = false;
+            }
+        }
+
+        if (todosEliminados)
+        {
+            await CargarRelaciones();
+            CerrarModalEliminarMultiples();
+        }
+    }
+}
