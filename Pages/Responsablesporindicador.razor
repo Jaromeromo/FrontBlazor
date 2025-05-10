@@ -102,11 +102,23 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>ID Responsable</label>
-                        <input type="text" class="form-control" @bind="idResponsable" required>
+                        <select class="form-control" @bind="idResponsable" required>
+                            <option value="">-- Seleccione un ID Responsable --</option>
+                            @foreach (var resp in responsablesDisponibles)
+                            {
+                                <option value="@resp">@resp</option>
+                            }
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicador" required>
+                        <select class="form-control" @bind="idIndicador" required>
+                            <option value="">-- Seleccione un ID Indicador --</option>
+                            @foreach (var ind in indicadoresDisponibles)
+                            {
+                                <option value="@ind">@ind</option>
+                            }
+                        </select>
                     </div>
                     @* La fecha se genera automáticamente con DEFAULT GETDATE() en la base de datos *@
                 </div>
@@ -132,11 +144,23 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>ID Responsable</label>
-                        <input type="text" class="form-control" @bind="idResponsableConsultar">
+                        <select class="form-control" @bind="idResponsableConsultar">
+                            <option value="">-- Seleccione un ID Responsable --</option>
+                            @foreach (var resp in responsablesDisponibles)
+                            {
+                                <option value="@resp">@resp</option>
+                            }
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicadorConsultar">
+                        <select class="form-control" @bind="idIndicadorConsultar">
+                            <option value="">-- Seleccione un ID Indicador --</option>
+                            @foreach (var ind in indicadoresDisponibles)
+                            {
+                                <option value="@ind">@ind</option>
+                            }
+                        </select>
                     </div>
                     <button class="btn btn-primary mt-2" @onclick="ConsultarResponsable">Buscar</button>
 
@@ -149,7 +173,7 @@
                         </div>
                         <div class="form-group">
                             <label>ID Indicador</label>
-                            <input type="number" class="form-control" value="@idIndicadorConsultar" disabled>
+                            <input type="text" class="form-control" value="@idIndicadorConsultar" disabled>
                         </div>
                         <div class="form-group">
                             <label>Fecha Asignación</label>
@@ -178,11 +202,23 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>ID Responsable</label>
-                            <input type="text" class="form-control" @bind="idResponsableEditar" required>
+                            <select class="form-control" @bind="idResponsableEditar" required>
+                                <option value="">-- Seleccione un ID Responsable --</option>
+                                @foreach (var resp in responsablesDisponibles)
+                                {
+                                    <option value="@resp">@resp</option>
+                                }
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>ID Indicador</label>
-                            <input type="number" class="form-control" @bind="idIndicadorEditar" required>
+                            <select class="form-control" @bind="idIndicadorEditar" required>
+                                <option value="">-- Seleccione un ID Indicador --</option>
+                                @foreach (var ind in indicadoresDisponibles)
+                                {
+                                    <option value="@ind">@ind</option>
+                                }
+                            </select>
                         </div>
                         @* No se permite editar la fecha de asignación ya que se genera automáticamente *@
                     </div>
@@ -255,6 +291,14 @@
     private bool mostrarModalEliminar = false;
     private bool mostrarModalEliminarMultiples = false;
     
+    // Listas para los selectores
+    private List<string> responsablesDisponibles = new();
+    private List<int> indicadoresDisponibles = new();
+    
+    // Listas que faltaban en el código original
+    private List<Dictionary<string, object>> listaResponsables = new();
+    private List<Dictionary<string, object>> listaIndicadores = new();
+    
     private Dictionary<string, object> responsableAEliminar;
     private Dictionary<string, object> responsableConsultado;
 
@@ -284,26 +328,113 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarRelaciones();
+        await CargarDatosIniciales();
+        await CargarResponsables();
+        await CargarIndicadores();
     }
 
-    private async Task CargarRelaciones()
+    private async Task CargarDatosIniciales()
     {
         cargando = true;
 
         try
         {
+            // Cargar responsables por indicador
             responsables = await servicioEntidad.ObtenerTodosAsync("proyecto", "responsablesporindicador") ?? new();
             responsablesSeleccionados = responsables.ToDictionary(r => r, r => false);
+            
+            // Extraer IDs únicos para los selectores
+            await ExtraerIdsDisponibles();
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al cargar relaciones: {ex.Message}");
+            Console.WriteLine($"Error al cargar datos iniciales: {ex.Message}");
             responsables = new();
         }
         finally
         {
             cargando = false;
+        }
+    }
+    
+    // Métodos que faltaban en el código original
+    private async Task CargarResponsables()
+    {
+        try
+        {
+            listaResponsables = await servicioEntidad.ObtenerTodosAsync("proyecto", "responsables") ?? new();
+            
+            // Si no hay datos en la tabla responsables, podríamos cargar los IDs disponibles
+            if (listaResponsables.Count == 0 && responsablesDisponibles.Count > 0)
+            {
+                listaResponsables = responsablesDisponibles.Select(id => new Dictionary<string, object> { 
+                    { "idresponsable", id } 
+                }).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar responsables: {ex.Message}");
+            listaResponsables = new();
+        }
+    }
+    
+    private async Task CargarIndicadores()
+    {
+        try
+        {
+            listaIndicadores = await servicioEntidad.ObtenerTodosAsync("proyecto", "indicadores") ?? new();
+            
+            // Si no hay datos en la tabla indicadores, podríamos cargar los IDs disponibles
+            if (listaIndicadores.Count == 0 && indicadoresDisponibles.Count > 0)
+            {
+                listaIndicadores = indicadoresDisponibles.Select(id => new Dictionary<string, object> { 
+                    { "idindicador", id } 
+                }).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar indicadores: {ex.Message}");
+            listaIndicadores = new();
+        }
+    }
+    
+    private async Task ExtraerIdsDisponibles()
+    {
+        // Extraer IDs únicos de responsables
+        responsablesDisponibles = responsables
+            .Select(r => ObtenerValor(r, "fkidresponsable"))
+            .Where(id => !string.IsNullOrEmpty(id))
+            .Distinct()
+            .OrderBy(id => id)
+            .ToList();
+            
+        // Extraer IDs únicos de indicadores
+        indicadoresDisponibles = responsables
+            .Select(r => ObtenerValor(r, "fkidindicador"))
+            .Where(id => !string.IsNullOrEmpty(id))
+            .Select(id => {
+                if (int.TryParse(id, out int idInt))
+                    return idInt;
+                return 0;
+            })
+            .Where(id => id > 0)
+            .Distinct()
+            .OrderBy(id => id)
+            .ToList();
+            
+        // Si no hay datos, agregar algunos valores de ejemplo para que los selectores no estén vacíos
+        if (responsablesDisponibles.Count == 0)
+        {
+            responsablesDisponibles.Add("RESP001");
+            responsablesDisponibles.Add("RESP002");
+        }
+        
+        if (indicadoresDisponibles.Count == 0)
+        {
+            indicadoresDisponibles.Add(1);
+            indicadoresDisponibles.Add(2);
         }
     }
 
@@ -324,12 +455,18 @@
         return "";
     }
 
-    private void AbrirModalGuardar()
+    private async void AbrirModalGuardar()
     {
+        if (responsablesDisponibles.Count == 0 || indicadoresDisponibles.Count == 0)
+        {
+            await ExtraerIdsDisponibles();
+        }
+            
         mostrarModalGuardar = true;
         idResponsable = "";
         idIndicador = 0;
         fechaAsignacion = DateTime.Now;
+        StateHasChanged();
     }
 
     private void CerrarModalGuardar()
@@ -352,7 +489,7 @@
 
             if (resultado)
             {
-                await CargarRelaciones();
+                await CargarDatosIniciales();
                 CerrarModalGuardar();
             }
         }
@@ -368,7 +505,7 @@
         {
             // Para consultar un responsable específico, necesitamos ambas claves primarias
             var url = $"fkidresponsable/{idResponsableConsultar}/fkidindicador/{idIndicadorConsultar}";
-            var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "responsablesporindicador", "fkidresponsable", idResponsableConsultar.ToString());
+            var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "responsablesporindicador", "fkidresponsable", idResponsableConsultar);
             
             if (resultado != null && ObtenerValor(resultado, "fkidindicador") == idIndicadorConsultar.ToString())
             {
@@ -386,16 +523,24 @@
         }
     }
 
-    private void CerrarModalConsulta()
+    private async void CerrarModalConsulta()
     {
         mostrarModalConsulta = false;
         idResponsableConsultar = "";
         idIndicadorConsultar = 0;
         responsableConsultado = null;
+        StateHasChanged();
     }
 
-    private void EditarResponsable(Dictionary<string, object> responsable)
+    private async void EditarResponsable(Dictionary<string, object> responsable)
     {
+        // Asegurar que los catálogos estén cargados
+        if (listaResponsables.Count == 0)
+            await CargarResponsables();
+            
+        if (listaIndicadores.Count == 0)
+            await CargarIndicadores();
+            
         idResponsableOriginal = ObtenerValor(responsable, "fkidresponsable");
         idIndicadorOriginal = int.Parse(ObtenerValor(responsable, "fkidindicador"));
         
@@ -413,6 +558,7 @@
         }
         
         mostrarModalEditar = true;
+        StateHasChanged();
     }
 
     private void EditarResponsableSeleccionado()
@@ -453,7 +599,7 @@
                 
                 if (creado)
                 {
-                    await CargarRelaciones();
+                    await CargarDatosIniciales();
                     CerrarModalEditar();
                 }
             }
@@ -493,7 +639,7 @@
 
                 if (resultado)
                 {
-                    await CargarRelaciones();
+                    await CargarDatosIniciales();
                     CerrarModalEliminar();
                 }
             }
@@ -544,7 +690,7 @@
 
         if (todosEliminados)
         {
-            await CargarRelaciones();
+            await CargarDatosIniciales();
             CerrarModalEliminarMultiples();
         }
     }

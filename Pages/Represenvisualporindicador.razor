@@ -99,12 +99,28 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicador" required>
+                        <label>Indicador</label>
+                        <select class="form-control" @bind="idIndicador" required>
+                            <option value="0">-- Seleccione un indicador --</option>
+                            @foreach (var indicador in indicador)
+                            {
+                                <option value="@ObtenerValor(indicador, "idindicador")">
+                                    @ObtenerValor(indicador, "idindicador") - @ObtenerValor(indicador, "nombre")
+                                </option>
+                            }
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>ID Representación Visual</label>
-                        <input type="number" class="form-control" @bind="idRepresenVisual" required>
+                        <label>Representación Visual</label>
+                        <select class="form-control" @bind="idRepresenVisual" required>
+                            <option value="0">-- Seleccione una representación visual --</option>
+                            @foreach (var visual in representacionesVisuales)
+                            {
+                                <option value="@ObtenerValor(visual, "idrepresenvisual")">
+                                    @ObtenerValor(visual, "idrepresenvisual") - @ObtenerValor(visual, "nombre")
+                                </option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -115,7 +131,6 @@
         </div>
     </div>
 </div>
-
 }
 
 @if (mostrarModalConsulta)
@@ -129,25 +144,38 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicadorConsultar">
+                        <label>Indicador</label>
+                        <select class="form-control" @bind="idIndicadorConsultar">
+                            <option value="0">-- Seleccione un indicador --</option>
+                            @foreach (var indicador in indicador)
+                            {
+                                <option value="@ObtenerValor(indicador, "idindicador")">
+                                    @ObtenerValor(indicador, "idindicador") - @ObtenerValor(indicador, "nombre")
+                                </option>
+                            }
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label>ID Representación Visual</label>
-                        <input type="number" class="form-control" @bind="idRepresenVisualConsultar">
+                        <label>Representación Visual</label>
+                        <select class="form-control" @bind="idRepresenVisualConsultar">
+                            <option value="0">-- Seleccione una representación visual --</option>
+                            @foreach (var visual in representacionesVisuales)
+                            {
+                                <option value="@ObtenerValor(visual, "idrepresenvisual")">
+                                    @ObtenerValor(visual, "idrepresenvisual") - @ObtenerValor(visual, "nombre")
+                                </option>
+                            }
+                        </select>
                     </div>
                     <button class="btn btn-primary mt-2" @onclick="ConsultarRelacion">Buscar</button>
 
                     @if (relacionConsultada != null)
                     {
                         <hr>
-                        <div class="form-group">
-                            <label>ID Indicador</label>
-                            <input type="number" class="form-control" value="@idIndicadorConsultar" disabled>
-                        </div>
-                        <div class="form-group">
-                            <label>ID Representación Visual</label>
-                            <input type="number" class="form-control" value="@idRepresenVisualConsultar" disabled>
+                        <div class="alert alert-info">
+                            <p><strong>Relación encontrada:</strong></p>
+                            <p>Indicador: @ObtenerNombreIndicador(int.Parse(ObtenerValor(relacionConsultada, "fkidindicador")))</p>
+                            <p>Representación Visual: @ObtenerNombreRepresentacionVisual(int.Parse(ObtenerValor(relacionConsultada, "fkidrepresenvisual")))</p>
                         </div>
                     }
                 </div>
@@ -171,20 +199,38 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label>ID Indicador Original</label>
-                            <input type="number" class="form-control" @bind="idIndicadorOriginal" disabled>
+                            <label>Indicador Original</label>
+                            <input type="text" class="form-control" value="@ObtenerNombreIndicador(idIndicadorOriginal)" disabled>
+                            <input type="hidden" @bind="idIndicadorOriginal">
                         </div>
                         <div class="form-group">
-                            <label>ID Representación Visual Original</label>
-                            <input type="number" class="form-control" @bind="idRepresenVisualOriginal" disabled>
+                            <label>Representación Visual Original</label>
+                            <input type="text" class="form-control" value="@ObtenerNombreRepresentacionVisual(idRepresenVisualOriginal)" disabled>
+                            <input type="hidden" @bind="idRepresenVisualOriginal">
                         </div>
                         <div class="form-group">
-                            <label>Nuevo ID Indicador</label>
-                            <input type="number" class="form-control" @bind="idIndicadorEditar" required>
+                            <label>Nuevo Indicador</label>
+                            <select class="form-control" @bind="idIndicadorEditar" required>
+                                <option value="0">-- Seleccione un indicador --</option>
+                                @foreach (var indicador in indicador)
+                                {
+                                    <option value="@ObtenerValor(indicador, "idindicador")">
+                                        @ObtenerValor(indicador, "idindicador") - @ObtenerValor(indicador, "nombre")
+                                    </option>
+                                }
+                            </select>
                         </div>
                         <div class="form-group">
-                            <label>Nuevo ID Representación Visual</label>
-                            <input type="number" class="form-control" @bind="idRepresenVisualEditar" required>
+                            <label>Nueva Representación Visual</label>
+                            <select class="form-control" @bind="idRepresenVisualEditar" required>
+                                <option value="0">-- Seleccione una representación visual --</option>
+                                @foreach (var visual in representacionesVisuales)
+                                {
+                                    <option value="@ObtenerValor(visual, "idrepresenvisual")">
+                                        @ObtenerValor(visual, "idrepresenvisual") - @ObtenerValor(visual, "nombre")
+                                    </option>
+                                }
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -209,8 +255,15 @@
                         <button type="button" class="close" @onclick="CerrarModalEliminar">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>¿Está seguro de que desea eliminar esta relación Representación Visual-Indicador?</p>
-                        <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                        @if (relacionAEliminar != null)
+                        {
+                            <p>¿Está seguro de que desea eliminar esta relación?</p>
+                            <div class="alert alert-warning">
+                                <p>Indicador: @ObtenerNombreIndicador(int.Parse(ObtenerValor(relacionAEliminar, "fkidindicador")))</p>
+                                <p>Representación Visual: @ObtenerNombreRepresentacionVisual(int.Parse(ObtenerValor(relacionAEliminar, "fkidrepresenvisual")))</p>
+                            </div>
+                            <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                        }
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" @onclick="CerrarModalEliminar">Cancelar</button>
@@ -233,7 +286,7 @@
                         <button type="button" class="close" @onclick="CerrarModalEliminarMultiples">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>¿Está seguro de que desea eliminar las relaciones seleccionadas?</p>
+                        <p>¿Está seguro de que desea eliminar las @relacionesSeleccionadas.Count(r => r.Value) relaciones seleccionadas?</p>
                         <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
                     </div>
                     <div class="modal-footer">
@@ -249,6 +302,8 @@
 
 @code {
     private List<Dictionary<string, object>> relaciones = new();
+    private List<Dictionary<string, object>> indicador = new();
+    private List<Dictionary<string, object>> representacionesVisuales = new();
     private Dictionary<Dictionary<string, object>, bool> relacionesSeleccionadas = new();
     private bool cargando = true;
     private bool mostrarModalGuardar = false;
@@ -285,22 +340,40 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await CargarRelaciones();
+        await CargarDatos();
     }
 
-    private async Task CargarRelaciones()
+    private async Task CargarDatos()
     {
         cargando = true;
 
         try
         {
-            relaciones = await servicioEntidad.ObtenerTodosAsync("proyecto", "represenvisualporindicador") ?? new();
+            // Cargar las relaciones
+            var tareasRelaciones = servicioEntidad.ObtenerTodosAsync("proyecto", "represenvisualporindicador");
+            
+            // Cargar los indicadores
+            var tareasIndicadores = servicioEntidad.ObtenerTodosAsync("proyecto", "indicador");
+            
+            // Cargar las representaciones visuales
+            var tareasVisuales = servicioEntidad.ObtenerTodosAsync("proyecto", "represenvisual");
+
+            // Esperar a que todas las tareas terminen
+            await Task.WhenAll(tareasRelaciones, tareasIndicadores, tareasVisuales);
+
+            // Asignar los resultados
+            relaciones = await tareasRelaciones ?? new();
+            indicador = await tareasIndicadores ?? new();
+            representacionesVisuales = await tareasVisuales ?? new();
+
             relacionesSeleccionadas = relaciones.ToDictionary(r => r, r => false);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error al cargar relaciones: {ex.Message}");
+            Console.WriteLine($"Error al cargar datos: {ex.Message}");
             relaciones = new();
+            indicador = new();
+            representacionesVisuales = new();
         }
         finally
         {
@@ -311,6 +384,27 @@
     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
     {
         return diccionario.TryGetValue(clave, out var valor) ? valor?.ToString() ?? "" : "";
+    }
+
+    private string ObtenerNombreIndicador(int idIndicador)
+    {
+    var indicadorEncontrado = indicador.FirstOrDefault(i => int.Parse(ObtenerValor(i, "idindicador")) == idIndicador);
+    if (indicadorEncontrado != null)
+    {
+        return $"{idIndicador} - {ObtenerValor(indicadorEncontrado, "nombre")}";
+    }
+    return $"{idIndicador}";
+    }
+
+
+    private string ObtenerNombreRepresentacionVisual(int idRepresenVisual)
+    {
+        var visual = representacionesVisuales.FirstOrDefault(v => int.Parse(ObtenerValor(v, "idrepresenvisual")) == idRepresenVisual);
+        if (visual != null)
+        {
+            return $"{idRepresenVisual} - {ObtenerValor(visual, "nombre")}";
+        }
+        return $"{idRepresenVisual}";
     }
 
     private void AbrirModalGuardar()
@@ -339,7 +433,7 @@
 
             if (resultado)
             {
-                await CargarRelaciones();
+                await CargarDatos();
                 CerrarModalGuardar();
             }
         }
@@ -354,7 +448,6 @@
         try
         {
             // Para consultar una relación específica, necesitamos ambas claves primarias
-            var url = $"fkidindicador/{idIndicadorConsultar}/fkidrepresenvisual/{idRepresenVisualConsultar}";
             var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "represenvisualporindicador", "fkidindicador", idIndicadorConsultar.ToString());
             
             if (resultado != null && ObtenerValor(resultado, "fkidrepresenvisual") == idRepresenVisualConsultar.ToString())
@@ -429,7 +522,7 @@
                 
                 if (creado)
                 {
-                    await CargarRelaciones();
+                    await CargarDatos();
                     CerrarModalEditar();
                 }
             }
@@ -469,7 +562,7 @@
 
                 if (resultado)
                 {
-                    await CargarRelaciones();
+                    await CargarDatos();
                     CerrarModalEliminar();
                 }
             }
@@ -520,7 +613,7 @@
 
         if (todosEliminados)
         {
-            await CargarRelaciones();
+            await CargarDatos();
             CerrarModalEliminarMultiples();
         }
     }

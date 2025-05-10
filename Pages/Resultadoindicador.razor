@@ -111,8 +111,14 @@
                         <input type="datetime-local" class="form-control" @bind="fechaCalculo" required>
                     </div>
                     <div class="form-group">
-                        <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicador" required>
+                        <label>Indicador</label>
+                        <select class="form-control" @bind="idIndicador" required>
+                            <option value="0">-- Seleccione un indicador --</option>
+                            @foreach (var indicador in indicadores)
+                            {
+                                <option value="@ObtenerValor(indicador, "id")">@ObtenerValor(indicador, "nombre")</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -139,6 +145,16 @@
                         <label>ID Resultado</label>
                         <input type="number" class="form-control" @bind="idResultadoConsultar">
                     </div>
+                    <div class="form-group">
+                        <label>Indicador</label>
+                        <select class="form-control" @bind="idIndicadorConsultar">
+                            <option value="0">-- Todos los indicadores --</option>
+                            @foreach (var indicador in indicadores)
+                            {
+                                <option value="@ObtenerValor(indicador, "id")">@ObtenerValor(indicador, "nombre")</option>
+                            }
+                        </select>
+                    </div>
                     <button class="btn btn-primary mt-2" @onclick="ConsultarResultado">Buscar</button>
 
                     @if (resultadoConsultado != null)
@@ -157,8 +173,8 @@
                             <input type="text" class="form-control" value="@ObtenerFechaFormateada(resultadoConsultado, "fechacalculo")" disabled>
                         </div>
                         <div class="form-group">
-                            <label>ID Indicador</label>
-                            <input type="number" class="form-control" value="@ObtenerValor(resultadoConsultado, "fkidindicador")" disabled>
+                            <label>Indicador</label>
+                            <input type="text" class="form-control" value="@ObtenerNombreIndicador(resultadoConsultado)" disabled>
                         </div>
                     }
                 </div>
@@ -190,8 +206,14 @@
                             <input type="datetime-local" class="form-control" @bind="fechaCalculoEditar" required>
                         </div>
                         <div class="form-group">
-                            <label>ID Indicador</label>
-                            <input type="number" class="form-control" @bind="idIndicadorEditar" required>
+                            <label>Indicador</label>
+                            <select class="form-control" @bind="idIndicadorEditar" required>
+                                <option value="0">-- Seleccione un indicador --</option>
+                                @foreach (var indicador in indicadores)
+                                {
+                                    <option value="@ObtenerValor(indicador, "id")">@ObtenerValor(indicador, "nombre")</option>
+                                }
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -256,6 +278,7 @@
 
 @code {
     private List<Dictionary<string, object>> resultados = new();
+    private List<Dictionary<string, object>> indicadores = new();
     private Dictionary<Dictionary<string, object>, bool> resultadosSeleccionados = new();
     private bool cargando = true;
     private bool mostrarModalGuardar = false;
@@ -295,6 +318,7 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarRelaciones();
+        await CargarIndicadores();
     }
 
     private async Task CargarRelaciones()
@@ -316,6 +340,19 @@
         }
     }
 
+    private async Task CargarIndicadores()
+    {
+        try
+        {
+            indicadores = await servicioEntidad.ObtenerTodosAsync("proyecto", "indicador") ?? new();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar indicadores: {ex.Message}");
+            indicadores = new();
+        }
+    }
+
     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
     {
         return diccionario.TryGetValue(clave, out var valor) ? valor?.ToString() ?? "" : "";
@@ -331,6 +368,27 @@
             }
         }
         return "";
+    }
+
+    private string ObtenerNombreIndicador(Dictionary<string, object> resultado)
+    {
+        if (resultado.TryGetValue("fkidindicador", out var idIndicadorObj) && idIndicadorObj != null)
+        {
+            int idIndicador;
+            if (int.TryParse(idIndicadorObj.ToString(), out idIndicador))
+            {
+                var indicador = indicadores.FirstOrDefault(i => 
+                    i.TryGetValue("id", out var idObj) && 
+                    int.TryParse(idObj.ToString(), out int id) && 
+                    id == idIndicador);
+
+                if (indicador != null)
+                {
+                    return $"{ObtenerValor(indicador, "id")} - {ObtenerValor(indicador, "nombre")}";
+                }
+            }
+        }
+        return ObtenerValor(resultado, "fkidindicador");
     }
 
     private void AbrirModalGuardar()
@@ -376,17 +434,24 @@
     {
         try
         {
-            // Primero buscar por id
-            var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "resultadoindicador", "id", idResultadoConsultar.ToString());
-            
-            if (resultado != null)
+            if (idResultadoConsultar > 0)
             {
-                resultadoConsultado = resultado;
+                // Buscar por id
+                var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "resultadoindicador", "id", idResultadoConsultar.ToString());
+                
+                if (resultado != null)
+                {
+                    resultadoConsultado = resultado;
+                }
+                else
+                {
+                    resultadoConsultado = null;
+                }
             }
-            else
+            else if (idIndicadorConsultar > 0)
             {
-                // Si no se encuentra por id, intentar buscar por fkidindicador
-                resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "resultadoindicador", "fkidindicador", idIndicadorConsultar.ToString());
+                // Buscar por fkidindicador
+                var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "resultadoindicador", "fkidindicador", idIndicadorConsultar.ToString());
                 resultadoConsultado = resultado;
             }
         }
@@ -470,7 +535,7 @@
             "proyecto", 
             "resultadoindicador", 
             "id",  // Columna clave
-            idActual.ToString(),  // Valor clave - This was missing
+            idActual.ToString(),  // Valor clave
             resultadoActualizado);
 
             if (actualizado)
