@@ -100,11 +100,37 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>ID Fuente</label>
-                        <input type="number" class="form-control" @bind="idFuente" required>
+                        @if (cargandoFuentes)
+                        {
+                            <p><em>Cargando fuentes...</em></p>
+                        }
+                        else
+                        {
+                            <select class="form-control" @bind="idFuente" required>
+                                <option value="0">Seleccione una fuente</option>
+                                @foreach (var fuente in fuentes)
+                                {
+                                    <option value="@ObtenerValor(fuente, "id")">@ObtenerValor(fuente, "id") - @ObtenerValor(fuente, "nombre")</option>
+                                }
+                            </select>
+                        }
                     </div>
                     <div class="form-group">
                         <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicador" required>
+                        @if (cargandoIndicadores)
+                        {
+                            <p><em>Cargando indicadores...</em></p>
+                        }
+                        else
+                        {
+                            <select class="form-control" @bind="idIndicador" required>
+                                <option value="0">Seleccione un indicador</option>
+                                @foreach (var indicador in indicadores)
+                                {
+                                    <option value="@ObtenerValor(indicador, "id")">@ObtenerValor(indicador, "id") - @ObtenerValor(indicador, "nombre")</option>
+                                }
+                            </select>
+                        }
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -130,11 +156,37 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label>ID Fuente</label>
-                        <input type="number" class="form-control" @bind="idFuenteConsultar">
+                        @if (cargandoFuentes)
+                        {
+                            <p><em>Cargando fuentes...</em></p>
+                        }
+                        else
+                        {
+                            <select class="form-control" @bind="idFuenteConsultar">
+                                <option value="0">Seleccione una fuente</option>
+                                @foreach (var fuente in fuentes)
+                                {
+                                    <option value="@ObtenerValor(fuente, "id")">@ObtenerValor(fuente, "id") - @ObtenerValor(fuente, "nombre")</option>
+                                }
+                            </select>
+                        }
                     </div>
                     <div class="form-group">
                         <label>ID Indicador</label>
-                        <input type="number" class="form-control" @bind="idIndicadorConsultar">
+                        @if (cargandoIndicadores)
+                        {
+                            <p><em>Cargando indicadores...</em></p>
+                        }
+                        else
+                        {
+                            <select class="form-control" @bind="idIndicadorConsultar">
+                                <option value="0">Seleccione un indicador</option>
+                                @foreach (var indicador in indicadores)
+                                {
+                                    <option value="@ObtenerValor(indicador, "id")">@ObtenerValor(indicador, "id") - @ObtenerValor(indicador, "nombre")</option>
+                                }
+                            </select>
+                        }
                     </div>
                     <button class="btn btn-primary mt-2" @onclick="ConsultarRelacion">Buscar</button>
 
@@ -143,11 +195,11 @@
                         <hr>
                         <div class="form-group">
                             <label>ID Fuente</label>
-                            <input type="number" class="form-control" value="@idFuenteConsultar" disabled>
+                            <input type="number" class="form-control" value="@ObtenerValor(relacionConsultada, "fkidfuente")" disabled>
                         </div>
                         <div class="form-group">
                             <label>ID Indicador</label>
-                            <input type="number" class="form-control" value="@idIndicadorConsultar" disabled>
+                            <input type="number" class="form-control" value="@ObtenerValor(relacionConsultada, "fkidindicador")" disabled>
                         </div>
                     }
                 </div>
@@ -172,19 +224,45 @@
                     <div class="modal-body">
                         <div class="form-group">
                             <label>ID Fuente Original</label>
-                            <input type="number" class="form-control" @bind="idFuenteOriginal" disabled>
+                            <input type="number" class="form-control" value="@idFuenteOriginal" disabled>
                         </div>
                         <div class="form-group">
                             <label>ID Indicador Original</label>
-                            <input type="number" class="form-control" @bind="idIndicadorOriginal" disabled>
+                            <input type="number" class="form-control" value="@idIndicadorOriginal" disabled>
                         </div>
                         <div class="form-group">
                             <label>Nuevo ID Fuente</label>
-                            <input type="number" class="form-control" @bind="idFuenteEditar" required>
+                            @if (cargandoFuentes)
+                            {
+                                <p><em>Cargando fuentes...</em></p>
+                            }
+                            else
+                            {
+                                <select class="form-control" @bind="idFuenteEditar" required>
+                                    <option value="0">Seleccione una fuente</option>
+                                    @foreach (var fuente in fuentes)
+                                    {
+                                        <option value="@ObtenerValor(fuente, "id")">@ObtenerValor(fuente, "id") - @ObtenerValor(fuente, "nombre")</option>
+                                    }
+                                </select>
+                            }
                         </div>
                         <div class="form-group">
                             <label>Nuevo ID Indicador</label>
-                            <input type="number" class="form-control" @bind="idIndicadorEditar" required>
+                            @if (cargandoIndicadores)
+                            {
+                                <p><em>Cargando indicadores...</em></p>
+                            }
+                            else
+                            {
+                                <select class="form-control" @bind="idIndicadorEditar" required>
+                                    <option value="0">Seleccione un indicador</option>
+                                    @foreach (var indicador in indicadores)
+                                    {
+                                        <option value="@ObtenerValor(indicador, "id")">@ObtenerValor(indicador, "id") - @ObtenerValor(indicador, "nombre")</option>
+                                    }
+                                </select>
+                            }
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -248,13 +326,18 @@
 }
 @code {
     private List<Dictionary<string, object>> relaciones = new();
+    private List<Dictionary<string, object>> fuentes = new();
+    private List<Dictionary<string, object>> indicadores = new();
     private Dictionary<Dictionary<string, object>, bool> relacionesSeleccionadas = new();
     private bool cargando = true;
+    private bool cargandoFuentes = true;
+    private bool cargandoIndicadores = true;
     private bool mostrarModalGuardar = false;
     private bool mostrarModalConsulta = false;
     private bool mostrarModalEditar = false;
     private bool mostrarModalEliminar = false;
     private bool mostrarModalEliminarMultiples = false;
+    private string mensajeError = "";
     
     private Dictionary<string, object> relacionAEliminar;
     private Dictionary<string, object> relacionConsultada;
@@ -285,6 +368,8 @@
     protected override async Task OnInitializedAsync()
     {
         await CargarRelaciones();
+        await CargarFuentes();
+        await CargarIndicadores();
     }
 
     private async Task CargarRelaciones()
@@ -307,25 +392,130 @@
         }
     }
 
+    private async Task CargarFuentes()
+    {
+        cargandoFuentes = true;
+
+        try
+        {
+            fuentes = await servicioEntidad.ObtenerTodosAsync("proyecto", "fuente") ?? new();
+            
+            // Si no hay fuentes, agregamos una fuente por defecto
+            if (fuentes.Count == 0)
+            {
+                var fuenteDefault = new Dictionary<string, object>
+                {
+                    { "id", 1 },
+                    { "nombre", "Fuente por defecto" }
+                };
+                fuentes.Add(fuenteDefault);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar fuentes: {ex.Message}");
+            
+            // Si hay un error, creamos una fuente por defecto
+            fuentes = new List<Dictionary<string, object>>
+            {
+                new Dictionary<string, object>
+                {
+                    { "id", 1 },
+                    { "nombre", "Fuente por defecto" }
+                }
+            };
+        }
+        finally
+        {
+            cargandoFuentes = false;
+        }
+    }
+
+    private async Task CargarIndicadores()
+    {
+        cargandoIndicadores = true;
+
+        try
+        {
+            indicadores = await servicioEntidad.ObtenerTodosAsync("proyecto", "indicador") ?? new();
+            
+            // Si no hay indicadores, agregamos un indicador por defecto
+            if (indicadores.Count == 0)
+            {
+                var indicadorDefault = new Dictionary<string, object>
+                {
+                    { "id", 1 },
+                    { "nombre", "Indicador por defecto" }
+                };
+                indicadores.Add(indicadorDefault);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al cargar indicadores: {ex.Message}");
+            
+            // Si hay un error, creamos un indicador por defecto
+            indicadores = new List<Dictionary<string, object>>
+            {
+                new Dictionary<string, object>
+                {
+                    { "id", 1 },
+                    { "nombre", "Indicador por defecto" }
+                }
+            };
+        }
+        finally
+        {
+            cargandoIndicadores = false;
+        }
+    }
+
     private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
     {
         return diccionario.TryGetValue(clave, out var valor) ? valor?.ToString() ?? "" : "";
     }
 
-    private void AbrirModalGuardar()
+    private async Task AbrirModalGuardar()
     {
         mostrarModalGuardar = true;
         idFuente = 0;
         idIndicador = 0;
+        mensajeError = "";
+        
+        // Asegurarse de que tenemos las fuentes e indicadores cargados
+        if (fuentes.Count == 0)
+        {
+            await CargarFuentes();
+        }
+        
+        if (indicadores.Count == 0)
+        {
+            await CargarIndicadores();
+        }
     }
 
     private void CerrarModalGuardar()
     {
         mostrarModalGuardar = false;
+        mensajeError = "";
     }
 
     private async Task GuardarRelacion()
     {
+        mensajeError = "";
+        
+        if (idFuente <= 0)
+        {
+            mensajeError = "Debe seleccionar una fuente.";
+            return;
+        }
+        
+        if (idIndicador <= 0)
+        {
+            mensajeError = "Debe seleccionar un indicador.";
+            return;
+        }
+
         try
         {
             var nuevaRelacion = new Dictionary<string, object>
@@ -341,10 +531,26 @@
                 await CargarRelaciones();
                 CerrarModalGuardar();
             }
+            else
+            {
+                mensajeError = "No se pudo crear la relación. Verifique que los IDs de fuente e indicador existan.";
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al guardar relación: {ex.Message}");
+            if (ex.Message.Contains("FOREIGN KEY constraint"))
+            {
+                mensajeError = "Los IDs seleccionados no existen en la base de datos.";
+            }
+            else if (ex.Message.Contains("unique") || ex.Message.Contains("PRIMARY KEY"))
+            {
+                mensajeError = "Esta relación ya existe en la base de datos.";
+            }
+            else
+            {
+                mensajeError = $"Error al guardar: {ex.Message}";
+            }
         }
     }
 
@@ -352,8 +558,7 @@
     {
         try
         {
-            // Para consultar una relación específica, necesitamos ambas claves primarias
-            var url = $"fkidfuente/{idFuenteConsultar}/fkidindicador/{idIndicadorConsultar}";
+            // Para consultar una relación específica con ambas claves primarias
             var resultado = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "fuentesporindicador", "fkidfuente", idFuenteConsultar.ToString());
             
             if (resultado != null && ObtenerValor(resultado, "fkidindicador") == idIndicadorConsultar.ToString())
@@ -380,33 +585,60 @@
         relacionConsultada = null;
     }
 
-    private void EditarRelacion(Dictionary<string, object> relacion)
+    private async Task EditarRelacion(Dictionary<string, object> relacion)
     {
         idFuenteOriginal = int.Parse(ObtenerValor(relacion, "fkidfuente"));
         idIndicadorOriginal = int.Parse(ObtenerValor(relacion, "fkidindicador"));
         
         idFuenteEditar = idFuenteOriginal;
         idIndicadorEditar = idIndicadorOriginal;
+        mensajeError = "";
+        
+        // Asegurarse de que tenemos las fuentes e indicadores cargados
+        if (fuentes.Count == 0)
+        {
+            await CargarFuentes();
+        }
+        
+        if (indicadores.Count == 0)
+        {
+            await CargarIndicadores();
+        }
         
         mostrarModalEditar = true;
     }
 
-    private void EditarRelacionSeleccionada()
+    private async Task EditarRelacionSeleccionada()
     {
         var relacionSeleccionada = relacionesSeleccionadas.FirstOrDefault(r => r.Value).Key;
         if (relacionSeleccionada != null)
         {
-            EditarRelacion(relacionSeleccionada);
+            await EditarRelacion(relacionSeleccionada);
         }
     }
 
     private void CerrarModalEditar()
     {
         mostrarModalEditar = false;
+        mensajeError = "";
     }
 
     private async Task ActualizarRelacion()
     {
+        mensajeError = "";
+        
+        if (idFuenteEditar <= 0)
+        {
+            mensajeError = "Debe seleccionar una fuente.";
+            return;
+        }
+        
+        if (idIndicadorEditar <= 0)
+        {
+            mensajeError = "Debe seleccionar un indicador.";
+            return;
+        }
+
         try
         {
             // Para actualizar una relación, primero debemos eliminar la existente y luego crear una nueva
@@ -431,11 +663,31 @@
                     await CargarRelaciones();
                     CerrarModalEditar();
                 }
+                else
+                {
+                    mensajeError = "No se pudo crear la nueva relación. Verifique que los IDs de fuente e indicador existan.";
+                }
+            }
+            else
+            {
+                mensajeError = "No se pudo eliminar la relación original.";
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al actualizar relación: {ex.Message}");
+            if (ex.Message.Contains("FOREIGN KEY constraint"))
+            {
+                mensajeError = "Los IDs seleccionados no existen en la base de datos.";
+            }
+            else if (ex.Message.Contains("unique") || ex.Message.Contains("PRIMARY KEY"))
+            {
+                mensajeError = "Esta relación ya existe en la base de datos.";
+            }
+            else
+            {
+                mensajeError = $"Error al actualizar: {ex.Message}";
+            }
         }
     }
 
