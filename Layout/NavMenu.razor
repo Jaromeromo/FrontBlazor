@@ -1,4 +1,5 @@
 ﻿<!-- Contenedor superior del menú de navegación -->
+@inject IJSRuntime JSRuntime
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">FrontBlazor</a>
@@ -17,139 +18,224 @@
             </NavLink>
         </div>
 
-        <!-- Counter -->
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
+                <NavLink class="nav-link" href="/login">
+                    <span class="bi bi-person-fill" aria-hidden="true"></span>Login
+                </NavLink>
         </div>
 
-        <!-- Weather -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-
-        <!-- Título para separar las secciones -->
+        <!-- Módulo de Usuarios -->
+        @if (misRutas.Contains("/mostrarmodusuario")){
         <div class="nav-title px-3 py-2 mt-2 mb-1 bg-light text-dark">
-            <strong>Tablas Sin Claves Foráneas</strong>
+            <strong>Módulo de Usuarios</strong>
         </div>
-
-        <!-- Opciones del sistema -->
+        }
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="usuarios">
-                <span class="bi bi-person-fill" aria-hidden="true"></span> Usuarios
-            </NavLink>
+                <NavLink class="nav-link" href="/usuario">
+                    <span class="bi bi-person-fill" aria-hidden="true"></span>Usuarios
+                </NavLink>
         </div>
+        @*@if (misRutas.Contains("/usuario"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/usuario">
+                    <span class="bi bi-person-fill" aria-hidden="true"></span>Usuarios
+                </NavLink>
+            </div>
+        }*@
+        @if (misRutas.Contains("/rol"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/rol">
+                    <span class="bi bi-person-badge-fill" aria-hidden="true"></span>Roles
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/rol_usuario"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/rol_usuario">
+                    <span class="bi bi-people-fill" aria-hidden="true"></span> RolUsuario
+                </NavLink>
+            </div>
+        }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="secciones">
-                <span class="bi bi-folder-fill" aria-hidden="true"></span> Secciones
-            </NavLink>
-        </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="subsecciones">
-                <span class="bi bi-folder2-open" aria-hidden="true"></span> Subsecciones
-            </NavLink>
+        <!-- Módulo de Indicadores -->
+         @if (misRutas.Contains("/mostrarmodindicadores")){
+        <div class="nav-title px-3 py-2 mt-4 mb-1 bg-light text-dark">
+            <strong>Módulo de Indicadores</strong>
         </div>
+        }
+        @if (misRutas.Contains("/seccion"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/seccion">
+                    <span class="bi bi-folder-fill" aria-hidden="true"></span>Secciones
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/subseccion"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/subseccion">
+                    <span class="bi bi-folder2-open" aria-hidden="true"></span>Subsecciones
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/fuente"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/fuente">
+                    <span class="bi bi-lightbulb-fill" aria-hidden="true"></span>Fuentes
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/unidadmedicion"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/unidadmedicion">
+                    <span class="bi bi-rulers" aria-hidden="true"></span>UnidadesdeMedición
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/tipoindicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/tipoindicador">
+                    <span class="bi bi-graph-up" aria-hidden="true"></span>TipodeIndicador
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/represenvisual"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/represenvisual">
+                    <span class="bi bi-bar-chart-fill" aria-hidden="true"></span>RepresentacionesVisuales
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/sentido"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/sentido">
+                    <span class="bi bi-compass-fill" aria-hidden="true"></span>Sentido
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/tipoactor"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/tipoactor">
+                    <span class="bi bi-people-fill" aria-hidden="true"></span>TipodeActor
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/indicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/indicador">
+                    <span class="bi bi-speedometer2" aria-hidden="true"></span>Indicador
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/actor"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/actor">
+                    <span class="bi bi-person-vcard-fill" aria-hidden="true"></span>Actores
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/responsablesporindicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/responsablesporindicador">
+                    <span class="bi bi-people-fill" aria-hidden="true"></span>ResponsablesporIndicador
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/represenvisualporindicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/represenvisualporindicador">
+                    <span class="bi bi-bar-chart-line-fill" aria-hidden="true"></span>RepresentaciónVisualporIndicador
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/resultadoindicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/resultadoindicador">
+                    <span class="bi bi-clipboard2-data-fill" aria-hidden="true"></span>ResultadoIndicador
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/variable"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/variable">
+                    <span class="bi bi-input-cursor" aria-hidden="true"></span>Variables
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/variablesporindicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/variablesporindicador">
+                    <span class="bi bi-calculator-fill" aria-hidden="true"></span>VariablesporIndicador
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/fuentesporindicador"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/fuentesporindicador">
+                    <span class="bi bi-database-fill" aria-hidden="true"></span>FuentesporIndicador
+                </NavLink>
+            </div>
+        }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fuentes">
-                <span class="bi bi-lightbulb-fill" aria-hidden="true"></span> Fuentes
-            </NavLink>
-        </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="unidadmedicion">
-                <span class="bi bi-rulers" aria-hidden="true"></span> Unidades de Medición
-            </NavLink>
+        <!-- Módulo Legal: Gestión de Indicadores (solo lectura) -->
+        @if (misRutas.Contains("/mostrarmodlegal")){
+        <div class="nav-title px-3 py-2 mt-4 mb-1 bg-light text-dark">
+            <strong>Módulo Legal: Gestión de Indicadores</strong>
         </div>
+        }
+        @if (misRutas.Contains("/articulo"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/articulo">
+                    <span class="bi bi-journal-text" aria-hidden="true"></span>Artículos
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/literal"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/literal">
+                    <span class="bi bi-text-center" aria-hidden="true"></span>Literales
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/numeral"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/numeral">
+                    <span class="bi bi-list-ol" aria-hidden="true"></span>Numerales
+                </NavLink>
+            </div>
+        }
+        @if (misRutas.Contains("/paragrafo"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/paragrafo">
+                    <span class="bi bi-paragraph" aria-hidden="true"></span>Párrafos
+                </NavLink>
+            </div>
+        }
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tipoindicador">
-                <span class="bi bi-graph-up" aria-hidden="true"></span> Tipo de Indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="represenvisuals">
-                <span class="bi bi-bar-chart-fill" aria-hidden="true"></span> Representaciones Visuales
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="roles">
-                <span class="bi bi-person-badge-fill" aria-hidden="true"></span> Roles
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="sentidos">
-                <span class="bi bi-compass-fill" aria-hidden="true"></span> Sentido
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tipoactor">
-                <span class="bi bi-people-fill" aria-hidden="true"></span> Tipo de Actor
-            </NavLink>
-        </div>
-
-        <!-- Título para tablas con claves foráneas -->
-        <div class="nav-title px-3 py-2 mt-3 mb-1 bg-light text-dark">
-            <strong>Tablas Con Claves Foráneas</strong>
-        </div>
-
-        <!-- Nuevo elemento para Indicador -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="indicador">
-                <span class="bi bi-speedometer2" aria-hidden="true"></span> Indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="actor1">
-                <span class="bi bi-person-vcard-fill" aria-hidden="true"></span> Actores
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="responsablesporindicador">
-                <span class="bi bi-people-fill" aria-hidden="true"></span> Responsables por Indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="represenvisualporindicador">
-                <span class="bi bi-bar-chart-line-fill" aria-hidden="true"></span> Representación Visual por Indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="resultadoindicador">
-                <span class="bi bi-clipboard2-data-fill" aria-hidden="true"></span> Resultado Indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="variable">
-                <span class="bi bi-input-cursor" aria-hidden="true"></span> Variables
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="variablesporindicador">
-                <span class="bi bi-calculator-fill" aria-hidden="true"></span> Variables por Indicador
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fuentesporindicador">
-                <span class="bi bi-database-fill" aria-hidden="true"></span> Fuentes por Indicador
-            </NavLink>
-        </div>
 
     </nav>
 </div>
@@ -159,4 +245,15 @@
     private bool collapseNavMenu = true;
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+
+    private List<string> misRutas = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        
+        var resultado = await JSRuntime.InvokeAsync<List<string>>("eval",
+            "Object.keys(sessionStorage).filter(k => k.startsWith('ruta_')).map(k => sessionStorage.getItem(k));");
+
+        misRutas = resultado ?? new List<string>();
+    }
 }
