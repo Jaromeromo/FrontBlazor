@@ -1,0 +1,586 @@
+@page "/RolUsuario"
+@using System.Collections.Generic
+@using System.Threading.Tasks
+@using Services
+@inject ServicioEntidad servicioEntidad
+@inject NavigationManager navegacionManager
+
+<div class="container-xl">
+   <div class="table-responsive">
+       <div class="table-wrapper">
+           <div class="table-title">
+               <div class="row">
+                   <div class="col-sm-6">
+                       <h2>Administrar <b>Roles de Usuario</b></h2>
+                   </div>
+                   <div class="col-sm-6">
+                       <button class="btn btn-info btn-sm" @onclick="() => mostrarModalConsulta = true">
+                           <i class="material-icons">&#xE8B6;</i> <span>Consultar</span>
+                       </button>
+
+                       <button class="btn btn-danger btn-sm" @onclick="MostrarModalEliminarMultiples">
+                           <i class="material-icons">&#xE15C;</i> <span>Eliminar</span>
+                       </button>
+
+                       <button class="btn btn-success btn-sm" @onclick="AbrirModalGuardar">
+                           <i class="material-icons">&#xE147;</i> <span>Agregar</span>
+                       </button>
+
+                       <button class="btn btn-info btn-sm" @onclick="EditarRolUsuarioSeleccionado">
+                           <i class="material-icons">&#xE254;</i> <span>Editar Seleccionado</span>
+                       </button>
+                   </div>
+               </div>
+           </div>
+
+           @if (cargando)
+           {
+               <p><em>Cargando...</em></p>
+           }
+           else if (rolesUsuario == null || rolesUsuario.Count == 0)
+           {
+               <p>No hay Roles de Usuario disponibles.</p>
+           }
+           else
+           {
+               <table class="table table-striped table-hover">
+                   <thead>
+                       <tr>
+                           <th>
+                               <span class="custom-checkbox">
+                                   <input type="checkbox" @bind="@seleccionarTodos">
+                                   <label></label>
+                               </span>
+                           </th>
+                           <th>Email</th>
+                           <th>ID Rol</th>
+                           <th>Acciones</th>
+                       </tr>
+                   </thead>
+                   <tbody>
+                       @foreach (var rolUsuario in rolesUsuario)
+                       {
+                           <tr>
+                               <td>
+                                   <span class="custom-checkbox">
+                                       <input type="checkbox" @bind="@rolesUsuarioSeleccionados[rolUsuario]">
+                                       <label></label>
+                                   </span>
+                               </td>
+                               <td>@ObtenerValor(rolUsuario, "fkemail")</td>
+                               <td>@ObtenerValor(rolUsuario, "fkidrol")</td>
+                               <td>
+                                   <a href="#" class="edit" @onclick="() => EditarRolUsuario(rolUsuario)" @onclick:preventDefault>
+                                       <i class="material-icons" title="Editar">&#xE254;</i>
+                                   </a>
+                                   <a href="#" class="delete" @onclick="() => EliminarRolUsuario(rolUsuario)"
+                                       @onclick:preventDefault>
+                                       <i class="material-icons" title="Eliminar">&#xE872;</i>
+                                   </a>
+                               </td>
+                           </tr>
+                       }
+                   </tbody>
+               </table>
+           }
+       </div>
+   </div>
+</div>
+
+@if (mostrarModalGuardar)
+{
+  <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+   <div class="modal-dialog">
+       <div class="modal-content">
+           <form @onsubmit="GuardarRolUsuario">
+               <div class="modal-header">
+                   <h4 class="modal-title">Agregar Rol de Usuario</h4>
+                   <button type="button" class="close" @onclick="CerrarModalGuardar">&times;</button>
+               </div>
+               <div class="modal-body">
+                   <div class="form-group">
+                       <label>Email</label>
+                       <input type="email" class="form-control" @bind="emailUsuario" required>
+                   </div>
+                   <div class="form-group">
+                       <label>Rol</label>
+                       <select class="form-control" @bind="idRol" required>
+                           <option value="0">-- Seleccione un rol --</option>
+                           @foreach (var rol in roles)
+                           {
+                               <option value="@ObtenerValor(rol, "id")">@ObtenerValor(rol, "nombre")</option>
+                           }
+                       </select>
+                   </div>
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" @onclick="CerrarModalGuardar">Cancelar</button>
+                   <button type="submit" class="btn btn-success">Guardar</button>
+               </div>
+           </form>
+       </div>
+   </div>
+</div>
+}
+
+@if (mostrarModalConsulta)
+{
+   <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <div class="modal-header">
+                   <h4 class="modal-title">Consultar Rol de Usuario</h4>
+                   <button type="button" class="close" @onclick="CerrarModalConsulta">&times;</button>
+               </div>
+               <div class="modal-body">
+                   <div class="form-group">
+                       <label>Email</label>
+                       <input type="email" class="form-control" @bind="emailConsultar">
+                   </div>
+                   <div class="form-group">
+                       <label>Rol</label>
+                       <select class="form-control" @bind="idRolConsultar">
+                           <option value="0">-- Todos los roles --</option>
+                           @foreach (var rol in roles)
+                           {
+                               <option value="@ObtenerValor(rol, "id")">@ObtenerValor(rol, "nombre")</option>
+                           }
+                       </select>
+                   </div>
+                   <button class="btn btn-primary mt-2" @onclick="ConsultarRolUsuario">Buscar</button>
+
+                   @if (rolUsuarioConsultado != null)
+                   {
+                       <hr>
+                       <div class="form-group">
+                           <label>Email</label>
+                           <input type="email" class="form-control" value="@ObtenerValor(rolUsuarioConsultado, "fkemail")" disabled>
+                       </div>
+                       <div class="form-group">
+                           <label>Rol</label>
+                           <input type="text" class="form-control" value="@ObtenerNombreRol(rolUsuarioConsultado)" disabled>
+                       </div>
+                   }
+               </div>
+               <div class="modal-footer">
+                   <button type="button" class="btn btn-secondary" @onclick="CerrarModalConsulta">Cerrar</button>
+               </div>
+           </div>
+       </div>
+   </div>
+}
+
+@if (mostrarModalEditar)
+{
+   <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <form @onsubmit="ActualizarRolUsuario">
+                   <div class="modal-header">
+                       <h4 class="modal-title">Editar Rol de Usuario</h4>
+                       <button type="button" class="close" @onclick="CerrarModalEditar">&times;</button>
+                   </div>
+                   <div class="modal-body">
+                       <div class="form-group">
+                           <label>Email</label>
+                           <input type="email" class="form-control" @bind="emailEditar" required>
+                       </div>
+                       <div class="form-group">
+                           <label>Rol</label>
+                           <select class="form-control" @bind="idRolEditar" required>
+                               <option value="0">-- Seleccione un rol --</option>
+                               @foreach (var rol in roles)
+                               {
+                                   <option value="@ObtenerValor(rol, "id")">@ObtenerValor(rol, "nombre")</option>
+                               }
+                           </select>
+                       </div>
+                   </div>
+                   <div class="modal-footer">
+                       <button type="button" class="btn btn-secondary" @onclick="CerrarModalEditar">Cancelar</button>
+                       <button type="submit" class="btn btn-info">Actualizar</button>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+}
+
+@if (mostrarModalEliminar)
+{
+   <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <form @onsubmit="ConfirmarEliminarRolUsuario">
+                   <div class="modal-header">
+                       <h4 class="modal-title">Eliminar Rol de Usuario</h4>
+                       <button type="button" class="close" @onclick="CerrarModalEliminar">&times;</button>
+                   </div>
+                   <div class="modal-body">
+                       <p>¿Está seguro de que desea eliminar este registro?</p>
+                       <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                   </div>
+                   <div class="modal-footer">
+                       <button type="button" class="btn btn-secondary" @onclick="CerrarModalEliminar">Cancelar</button>
+                       <button type="submit" class="btn btn-danger">Eliminar</button>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+}
+
+@if (mostrarModalEliminarMultiples)
+{
+   <div class="modal fade show d-block" style="background: rgba(0, 0, 0, 0.5);">
+       <div class="modal-dialog">
+           <div class="modal-content">
+               <form @onsubmit="ConfirmarEliminarSeleccionados">
+                   <div class="modal-header">
+                       <h4 class="modal-title">Eliminar Roles de Usuario Seleccionados</h4>
+                       <button type="button" class="close" @onclick="CerrarModalEliminarMultiples">&times;</button>
+                   </div>
+                   <div class="modal-body">
+                       <p>¿Está seguro de que desea eliminar los registros seleccionados?</p>
+                       <p class="text-warning"><small>Esta acción no se puede deshacer.</small></p>
+                   </div>
+                   <div class="modal-footer">
+                       <button type="button" class="btn btn-secondary"
+                           @onclick="CerrarModalEliminarMultiples">Cancelar</button>
+                       <button type="submit" class="btn btn-danger">Eliminar</button>
+                   </div>
+               </form>
+           </div>
+       </div>
+   </div>
+}
+
+@code {
+   private List<Dictionary<string, object>> rolesUsuario = new();
+   private List<Dictionary<string, object>> roles = new();
+   private Dictionary<Dictionary<string, object>, bool> rolesUsuarioSeleccionados = new();
+   private bool cargando = true;
+   private bool mostrarModalGuardar = false;
+   private bool mostrarModalConsulta = false;
+   private bool mostrarModalEditar = false;
+   private bool mostrarModalEliminar = false;
+   private bool mostrarModalEliminarMultiples = false;
+
+   // Variables para los formularios
+   private string emailUsuario;
+   private string emailEditar;
+   private string emailConsultar;
+   private int idRol;
+   private int idRolConsultar;
+   private int idRolEditar;
+   private string emailActual; // Para guardar el email actual al editar
+   private int idRolActual; // Para guardar el id rol actual al editar
+
+   private Dictionary<string, object> rolUsuarioAEliminar;
+   private Dictionary<string, object> rolUsuarioConsultado;
+
+   private bool seleccionarTodos
+   {
+       get => _seleccionarTodos;
+       set
+       {
+           _seleccionarTodos = value;
+           foreach (var rolUsuario in rolesUsuario)
+           {
+               rolesUsuarioSeleccionados[rolUsuario] = _seleccionarTodos;
+           }
+       }
+   }
+   private bool _seleccionarTodos = false;
+
+   protected override async Task OnInitializedAsync()
+   {
+       await CargarRelaciones();
+       await CargarRoles();
+   }
+
+   private async Task CargarRelaciones()
+   {
+       cargando = true;
+       try
+       {
+           rolesUsuario = await servicioEntidad.ObtenerTodosAsync("proyecto", "rol_usuario") ?? new();
+           rolesUsuarioSeleccionados = rolesUsuario.ToDictionary(r => r, r => false);
+       }
+       catch (Exception ex)
+       {
+           Console.WriteLine($"Error al cargar roles de usuario: {ex.Message}");
+           rolesUsuario = new();
+       }
+       finally
+       {
+           cargando = false;
+       }
+   }
+
+   private async Task CargarRoles()
+   {
+       try
+       {
+           roles = await servicioEntidad.ObtenerTodosAsync("proyecto", "rol") ?? new();
+       }
+       catch (Exception ex)
+       {
+           Console.WriteLine($"Error al cargar roles: {ex.Message}");
+           roles = new();
+       }
+   }
+
+   private string ObtenerValor(Dictionary<string, object> diccionario, string clave)
+   {
+       return diccionario.TryGetValue(clave, out var valor) ? valor?.ToString() ?? "" : "";
+   }
+
+   private string ObtenerNombreRol(Dictionary<string, object> rolUsuario)
+   {
+       if (rolUsuario.TryGetValue("fkidrol", out var idRolObj) && idRolObj != null)
+       {
+           int idRol;
+           if (int.TryParse(idRolObj.ToString(), out idRol))
+           {
+               var rol = roles.FirstOrDefault(r => 
+                   r.TryGetValue("id", out var idObj) && 
+                   int.TryParse(idObj.ToString(), out int id) && 
+                   id == idRol);
+
+               if (rol != null)
+               {
+                   return $"{ObtenerValor(rol, "id")} - {ObtenerValor(rol, "nombre")}";
+               }
+           }
+       }
+       return ObtenerValor(rolUsuario, "fkidrol");
+   }
+
+   private void AbrirModalGuardar()
+   {
+       mostrarModalGuardar = true;
+       emailUsuario = "";
+       idRol = 0;
+   }
+
+   private void CerrarModalGuardar()
+   {
+       mostrarModalGuardar = false;
+   }
+
+   private async Task GuardarRolUsuario()
+   {
+       try
+       {
+           // Crear un nuevo rol de usuario con los campos según la estructura de la tabla
+           var nuevoRolUsuario = new Dictionary<string, object>
+           {
+               { "fkemail", emailUsuario },
+               { "fkidrol", idRol }
+           };
+
+           var resultado = await servicioEntidad.CrearAsync("proyecto", "rol_usuario", nuevoRolUsuario);
+
+           if (resultado)
+           {
+               await CargarRelaciones();
+               CerrarModalGuardar();
+           }
+       }
+       catch (Exception ex)
+       {
+           Console.WriteLine($"Error al guardar rol de usuario: {ex.Message}");
+       }
+   }
+
+   private async Task ConsultarRolUsuario()
+   {
+       try
+       {
+           if (!string.IsNullOrEmpty(emailConsultar))
+           {
+               // Buscar por email
+               var rolUsuario = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "rol_usuario", "fkemail", emailConsultar);
+               
+               if (rolUsuario != null)
+               {
+                   rolUsuarioConsultado = rolUsuario;
+               }
+               else
+               {
+                   rolUsuarioConsultado = null;
+               }
+           }
+           else if (idRolConsultar > 0)
+           {
+               // Buscar por fkidrol
+               var rolUsuario = await servicioEntidad.ObtenerPorClaveAsync("proyecto", "rol_usuario", "fkidrol", idRolConsultar.ToString());
+               rolUsuarioConsultado = rolUsuario;
+           }
+       }
+       catch (Exception ex)
+       {
+           Console.WriteLine($"Error al consultar rol de usuario: {ex.Message}");
+           rolUsuarioConsultado = null;
+       }
+   }
+
+   private void CerrarModalConsulta()
+   {
+       mostrarModalConsulta = false;
+       emailConsultar = "";
+       idRolConsultar = 0;
+       rolUsuarioConsultado = null;
+   }
+
+   private void EditarRolUsuario(Dictionary<string, object> rolUsuario)
+   {
+       // Guardar las claves actuales para la actualización
+       emailActual = ObtenerValor(rolUsuario, "fkemail");
+       if (int.TryParse(ObtenerValor(rolUsuario, "fkidrol"), out int idRol))
+       {
+           idRolActual = idRol;
+       }
+
+       // Establecer valores para edición
+       emailEditar = emailActual;
+       idRolEditar = idRolActual;
+
+       mostrarModalEditar = true;
+   }
+
+   private void EditarRolUsuarioSeleccionado()
+   {
+       var rolUsuarioSeleccionado = rolesUsuarioSeleccionados.FirstOrDefault(r => r.Value).Key;
+       if (rolUsuarioSeleccionado != null)
+       {
+           EditarRolUsuario(rolUsuarioSeleccionado);
+       }
+   }
+
+   private void CerrarModalEditar()
+   {
+       mostrarModalEditar = false;
+   }
+
+   private async Task ActualizarRolUsuario()
+   {
+       try
+       {
+           // Como es una tabla con clave compuesta, primero eliminamos el registro anterior
+           // Usando el email como clave principal para eliminar
+           var eliminado = await servicioEntidad.EliminarAsync(
+               "proyecto", 
+               "rol_usuario", 
+               "fkemail",
+               emailActual);
+
+           if (eliminado)
+           {
+               // Crear el nuevo registro con los valores actualizados
+               var rolUsuarioActualizado = new Dictionary<string, object>
+               {
+                   { "fkemail", emailEditar },
+                   { "fkidrol", idRolEditar }
+               };
+
+               var creado = await servicioEntidad.CrearAsync("proyecto", "rol_usuario", rolUsuarioActualizado);
+
+               if (creado)
+               {
+                   await CargarRelaciones();
+                   CerrarModalEditar();
+               }
+           }
+       }
+       catch (Exception ex)
+       {
+           Console.WriteLine($"Error al actualizar rol de usuario: {ex.Message}");
+       }
+   }
+
+   private void EliminarRolUsuario(Dictionary<string, object> rolUsuario)
+   {
+       rolUsuarioAEliminar = rolUsuario;
+       mostrarModalEliminar = true;
+   }
+
+   private void CerrarModalEliminar()
+   {
+       mostrarModalEliminar = false;
+       rolUsuarioAEliminar = null;
+   }
+
+   private async Task ConfirmarEliminarRolUsuario()
+   {
+       if (rolUsuarioAEliminar != null)
+       {
+           var email = ObtenerValor(rolUsuarioAEliminar, "fkemail");
+
+           try
+           {
+               var resultado = await servicioEntidad.EliminarAsync(
+                   "proyecto",
+                   "rol_usuario",
+                   "fkemail",
+                   email);
+
+               if (resultado)
+               {
+                   await CargarRelaciones();
+                   CerrarModalEliminar();
+               }
+           }
+           catch (Exception ex)
+           {
+               Console.WriteLine($"Error al eliminar rol de usuario: {ex.Message}");
+           }
+       }
+   }
+
+   private void MostrarModalEliminarMultiples()
+   {
+       if (rolesUsuarioSeleccionados.Any(r => r.Value))
+       {
+           mostrarModalEliminarMultiples = true;
+       }
+   }
+
+   private void CerrarModalEliminarMultiples()
+   {
+       mostrarModalEliminarMultiples = false;
+   }
+
+   private async Task ConfirmarEliminarSeleccionados()
+   {
+       var rolesUsuarioParaEliminar = rolesUsuarioSeleccionados
+           .Where(r => r.Value)
+           .Select(r => r.Key)
+           .ToList();
+
+       bool todosEliminados = true;
+
+       foreach (var rolUsuario in rolesUsuarioParaEliminar)
+       {
+           var email = ObtenerValor(rolUsuario, "fkemail");
+
+           var res = await servicioEntidad.EliminarAsync(
+               "proyecto",
+               "rol_usuario",
+               "fkemail",
+               email);
+
+           if (!res)
+           {
+               todosEliminados = false;
+           }
+       }
+
+       if (todosEliminados)
+       {
+           await CargarRelaciones();
+           CerrarModalEliminarMultiples();
+       }
+   }
+}
