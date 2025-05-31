@@ -168,6 +168,7 @@
            </div>
        </div>
    </div>
+
 }
 
 @if (mostrarModalEditar)
@@ -434,6 +435,7 @@
        rolUsuarioConsultado = null;
    }
 
+   //Método para Editar el rol del Usuario
    private void EditarRolUsuario(Dictionary<string, object> rolUsuario)
    {
        // Guardar las claves actuales para la actualización
@@ -443,7 +445,7 @@
            idRolActual = idRol;
        }
 
-       // Establecer valores para edición
+       //Establecer valores para edición
        emailEditar = emailActual;
        idRolEditar = idRolActual;
 
@@ -468,8 +470,8 @@
    {
        try
        {
-           // Como es una tabla con clave compuesta, primero eliminamos el registro anterior
-           // Usando el email como clave principal para eliminar
+           //Como es una tabla con clave compuesta, primero eliminamos el registro anterior
+           //Usando el email como clave principal para eliminar
            var eliminado = await servicioEntidad.EliminarAsync(
                "proyecto", 
                "rol_usuario", 
@@ -478,7 +480,7 @@
 
            if (eliminado)
            {
-               // Crear el nuevo registro con los valores actualizados
+               //Crear el nuevo registro con los valores actualizados
                var rolUsuarioActualizado = new Dictionary<string, object>
                {
                    { "fkemail", emailEditar },
