@@ -68,7 +68,7 @@
                                     </span>
                                 </td>
                                 <td>@ObtenerValor(usuario, "email")</td>
-                                <td>@ObtenerValor(usuario, "password")</td>
+                                <td>@ObtenerValor(usuario, "contrasena")</td>
                                 <td>
                                     <a href="#" class="edit" @onclick="() => EditarUsuario(usuario)" @onclick:preventDefault>
                                         <i class="material-icons" title="Editar">&#xE254;</i>
@@ -322,7 +322,7 @@
         var nuevoUsuario = new Dictionary<string, object>
         { 
             { "email", emailUsuario },
-            { "password", passwordUsuario }
+            { "contrasena", passwordUsuario }
         };
 
         bool resultado = await servicioEntidad.CrearAsync("proyecto", "usuario", nuevoUsuario);
@@ -349,7 +349,7 @@
     {
         usuarioParaEditar = usuario;
         emailUsuarioEditar = ObtenerValor(usuario, "email");
-        passwordUsuarioEditar = ObtenerValor(usuario, "password");
+        passwordUsuarioEditar = ObtenerValor(usuario, "contrasena");
         mostrarModalEditar = true;
         StateHasChanged();
     }
@@ -368,7 +368,7 @@ private async Task ActualizarUsuario()
 
     // Actualizar solo los campos permitidos: 'email' y 'password'
     usuarioParaEditar["email"] = emailUsuarioEditar;
-    usuarioParaEditar["password"] = passwordUsuarioEditar;
+    usuarioParaEditar["contrasena"] = passwordUsuarioEditar;
 
     // Llamada al servicio de actualización
     bool resultado = await servicioEntidad.ActualizarAsync(
@@ -427,7 +427,7 @@ private async Task ActualizarUsuario()
         {
             usuarioConsultado = resultado;
             emailUsuarioConsulta = ObtenerValor(resultado, "email");
-            passwordUsuarioConsulta = ObtenerValor(resultado, "password");
+            passwordUsuarioConsulta = ObtenerValor(resultado, "contrasena");
         }
         else
         {
