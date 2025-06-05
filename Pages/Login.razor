@@ -33,6 +33,7 @@
           </div>
 
           <!-- Campo de entrada para el correo electrónico -->
+          @if(cesionniciada){
           <div class="form-outline mb-4">
             <InputText id="form3Example3" class="form-control form-control-lg" 
                        @bind-Value="modeloLogin.Correo" placeholder="Enter a valid email address" />
@@ -47,7 +48,7 @@
             <label class="form-label" for="form3Example4">Password</label>
             <ValidationMessage For="@(() => modeloLogin.Contrasena)" />
           </div>
-
+      }
     using Microsoft.VisualBasic;
           <!-- Botón de envío del formulario -->
           <div class="text-center text-lg-start mt-4 pt-2">
@@ -63,6 +64,7 @@
 @code {
     // Crear el modelo de datos para almacenar el correo electrónico y la contraseña ingresados
     private ModeloLogin modeloLogin = new ModeloLogin();
+    private bool cesionniciada = true;
 
     /// <summary>
     /// Manejar el proceso de login cuando el formulario se envía de manera válida.
@@ -194,6 +196,7 @@
 
                         
                         // Redirigir al usuario a la página principal
+                        cesionniciada = false;
                         Navigation.NavigateTo("/", forceLoad: true);
                     }
                     else
@@ -260,7 +263,7 @@
     private async Task CerrarSesion(){
     // Limpiar todo el sessionStorage
      await JSRuntime.InvokeVoidAsync("sessionStorage.clear");
-
+      cesionniciada = true;
     // Redirigir al usuario a la página de login
      Navigation.NavigateTo("/", forceLoad: true);
     }

@@ -30,19 +30,16 @@
             <strong>Módulo de Usuarios</strong>
         </div>
         }
-        <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/usuario">
-                    <span class="bi bi-person-fill" aria-hidden="true"></span>Usuarios
-                </NavLink>
-        </div>
-        @*@if (misRutas.Contains("/usuario"))
+        
+        @if (misRutas.Contains("/usuario"))
         {
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="/usuario">
                     <span class="bi bi-person-fill" aria-hidden="true"></span>Usuarios
                 </NavLink>
             </div>
-        }*@
+        }
+        
         @if (misRutas.Contains("/rol"))
         {
             <div class="nav-item px-3">
@@ -179,46 +176,7 @@
                 </NavLink>
             </div>
         }
-        @if (misRutas.Contains("/articulo"))
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/articulo">
-                    <span class="bi bi-input-cursor" aria-hidden="true"></span>Articulo
-                </NavLink>
-            </div>
-        }
-        @if (misRutas.Contains("/literal"))
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/literal">
-                    <span class="bi bi-input-cursor" aria-hidden="true"></span>Literal
-                </NavLink>
-            </div>
-        }
-        @if (misRutas.Contains("/numeral"))
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/numeral">
-                    <span class="bi bi-input-cursor" aria-hidden="true"></span>Numeral
-                </NavLink>
-            </div>
-        }
-        @if (misRutas.Contains("/paragrafo"))
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/paragrafo">
-                    <span class="bi bi-input-cursor" aria-hidden="true"></span>Paragrafo
-                </NavLink>
-            </div>
-        }
-        @if (misRutas.Contains("/rol_usuario"))
-        {
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="/rol_usuario">
-                    <span class="bi bi-input-cursor" aria-hidden="true"></span>RolUsuario
-                </NavLink>
-            </div>
-        }
+       
         @if (misRutas.Contains("/variablesporindicador"))
         {
             <div class="nav-item px-3">
@@ -243,6 +201,7 @@
             <strong>Módulo Legal: Gestión de Indicadores</strong>
         </div>
         }
+        
         @if (misRutas.Contains("/articulo"))
         {
             <div class="nav-item px-3">
@@ -280,7 +239,7 @@
    </nav>
 </div>
 
-<!-- Código C# -->
+
 @code {
 
     private bool collapseNavMenu = true;

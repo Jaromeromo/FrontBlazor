@@ -18,18 +18,21 @@
                         <button class="btn btn-info btn-sm" @onclick="() => mostrarModalConsulta = true">
                             <i class="material-icons">&#xE8B6;</i> <span>Consultar</span>
                         </button>
-
+                        @if(RolesUsuario.Contains("admin")){
                         <button class="btn btn-danger btn-sm" @onclick="MostrarModalEliminarMultiples">
                             <i class="material-icons">&#xE15C;</i> <span>Eliminar</span>
                         </button>
-
+                        }
+                        @if(RolesUsuario.Contains("admin")){
                         <button class="btn btn-success btn-sm" @onclick="AbrirModalGuardar">
                             <i class="material-icons">&#xE147;</i> <span>Agregar</span>
                         </button>
-
+                        }
+                        @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                         <button class="btn btn-info btn-sm" @onclick="EditarIndicadorSeleccionado">
                             <i class="material-icons">&#xE254;</i> <span>Editar Seleccionado</span>
                         </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -47,12 +50,14 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
+                            @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                             <th>
                                 <span class="custom-checkbox">
                                     <input type="checkbox" @bind="@seleccionarTodos">
                                     <label></label>
                                 </span>
                             </th>
+                            }
                             <th>Código</th>
                             <th>Nombre</th>
                             <th>Meta</th>
@@ -65,24 +70,30 @@
                         @foreach (var indicad in Indicadores)
                         {
                             <tr>
+                                @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                                 <td>
                                     <span class="custom-checkbox">
                                         <input type="checkbox" @bind="@inidcadoresSeleccionado[indicad]">
                                         <label></label>
                                     </span>
                                 </td>
+                                }
                                 <td>@ObtenerValor(indicad, "codigo")</td>
                                 <td>@ObtenerValor(indicad, "nombre")</td>
                                 <td>@ObtenerValor(indicad, "meta")</td>
                                 <td>@ObtenerNombreFrecuencia(indicad)</td>
                                 <td>@ObtenerNombresResponsables(indicad)</td>
                                 <td>
+                                    @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                                     <a href="#" class="edit" @onclick="() => EditarIndicador(indicad)" @onclick:preventDefault>
                                         <i class="material-icons" title="Editar">&#xE254;</i>
                                     </a>
+                                    }
+                                    @if(RolesUsuario.Contains("admin")){
                                     <a href="#" class="delete" @onclick="() => EliminarIndicador(indicad)" @onclick:preventDefault>
                                         <i class="material-icons" title="Eliminar">&#xE872;</i>
                                     </a>
+                                    }
                                     <a href="#" class="visualizar" @onclick="() => VerInformacionIndicador(indicad)"
                                         @onclick:preventDefault>
                                         <i class="material-icons" title="Visualizar">&#xE8F4;</i>
@@ -522,11 +533,123 @@
     </div>
 }
 
+@if(mostrarInformacion){
+    <div class="container-xl">
+    <div class="table-responsive">
+        <div class="table-wrapper">
+            <div class="table-title">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <h2>Indicador <b>@ObtenerValor(IndicadorInfomracion,"codigo")</b></h2>
+                    </div>
+                    <div class="col-sm-6">
+                       <button class="btn btn-danger btn-sm" @onclick="() => mostrarInformacion = false">
+                                <i class="material-icons">&#xE5CD;</i> <span>Cerrar</span>
+                       </button>
+                    </div>
+                </div>
+            </div>
+            @if(cargandoimfor){
+                   <p><em>Cargando...</em></p>
+            }else{
+                 <h6>Nombre: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre")</span></h6>
+                 <h6>Objetivo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"objetivo")</span></h6>
+                 <h6>Alcance: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"alcance")</span></h6>
+                 
+                 <h2>Formulas y metas</h2>
+                 <h6>Formula: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"formula")</span></h6>
+                 <h6>Meta: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"meta")</span></h6>
+                 
+                 <h2>Dimensiones Técnicas</h2>
+                 <h6>Tipo de Indicador: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"tipoindicador")</span></h6>
+                 <h6>Unidad de Medición: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"unidadmedicion")</span></h6>
+                 <h6>Sentido del Indicador: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"sentidoindicador")</span></h6>
+                 <h6>Frecuencia de Medición: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"frecuenciaindicador")</span></h6>
+                 
+                 <h2> Fundamento Normativo (Decreto 1330)</h2>
+                 <h4>Artículo.</h4>
+                 <h6>Nombre articulo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombrearticulo")</span></h6>
+                 <h6>Seccion articulo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"seccionarticulo")</span></h6>
+                 <h6>Subseccion articulo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"subseccionarticulo")</span></h6>
+                 <h6>Descripción del articulo.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"descripcionarticulo")</p>
+
+                 <h4>Literal.</h4>
+                 <h5>Artículo literal</h5>
+                 <h6>Descripción del literal.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"literal_descripcionliteral")</p>
+                 <h6>Articulo literal: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"literal_nombrearticulo")</span></h6>
+                 <h6>Seccion articulo literal: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"literal_nombreseccion")</span></h6>
+                 <h6>Subseccion articulo literal: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"literal_nombresubseccion")</span></h6>
+                 <h6>Descripción del articulo literal.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"literal_descripcionarticulo")</p>
+                  
+                 <h4>Numeral.</h4>
+                 <h6>Descripción del Numeral.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"descripcion_numeral")</p>
+                 <h5>Literal Numeral.</h5>
+                 <h6>Descripción del literal.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"descripcion_literal_numeral")</p>
+                 <h6>Articulo literal: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre_articulo_numeral")</span></h6>
+                 <h6>Seccion articulo literal: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre_seccion_numeral")</span></h6>
+                 <h6>Subseccion articulo literal: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre_subseccion_numeral")</span></h6>
+                 <h6>Descripción del articulo literal.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"descripcion_articulo_numeral")</p>
+
+                 <h4>Parágrafo.</h4>
+                 <h5>rtículo parágrafo</h5>
+                 <h6>Descripción del parágrafo.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"descripcion_paragrafo")</p>
+                 <h6>Artículo parágrafo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre_articulo_paragrafo")</span></h6>
+                 <h6>Sección artículo parágrafo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre_seccion_paragrafo")</span></h6>
+                 <h6>Subsección artículo parágrafo: <span class="small text-dark">@ObtenerValor(IndicadorInfomracion,"nombre_subseccion_paragrafo")</span></h6>
+                 <h6>Descripción del artículo parágrafo.</h6>
+                 <p class="text-dark">@ObtenerValor(IndicadorInfomracion,"descripcion_articulo_paragrafo")</p>
+                
+                <h4>Responsables del Indicador.</h4>
+                 <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre Responsable</th>
+            <th>Tipo Responsable</th>
+            <th>Fecha de Asignación</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (IndicadorInfomracion.TryGetValue("responsables_list", out var responsables) && 
+             responsables is List<Dictionary<string, object>> listaResponsables)
+        {
+            @foreach (var responsable in listaResponsables)
+            {
+                <tr>
+                    <td>@ObtenerValor(responsable, "nombre_actor_responsable")</td>
+                    <td>@ObtenerValor(responsable, "nombre_tipoactor_responsable")</td>
+                    <td>@ObtenerValor(responsable, "fechaasignacion_responsable")</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3">No hay responsables asignados</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+                 <h4>Responsables del Indicador.</h4>
+            }
+                
+        </div>
+    </div>
+</div>
+}
+
 
 
 @code {
     private List<Dictionary<string, object>> Indicadores = new();
-    private List<Dictionary<string, object>> IndicadorInfomracion = new();
+    private Dictionary<string, object> IndicadorInfomracion = new();
     private Dictionary<Dictionary<string, object>, bool> inidcadoresSeleccionado = new();
     private bool cargando = true;
     private string? errorMensaje = null;
@@ -536,6 +659,9 @@
     private bool mostrarModalEditar = false;
     private bool mostrarModalEliminar = false;
     private bool mostrarModalEliminarMultiples = false;
+    
+    private bool cargandoimfor = false;
+    private bool mostrarInformacion = false;
     /*Variables para inicar guardar indicador*/
     private string idIndicador = "";
     private string codigoIndicador = "";
@@ -868,14 +994,17 @@
             {
                 indicador.Remove(IndicadorParaEliminar);
                 inidcadoresSeleccionado.Remove(IndicadorParaEliminar);
+                mostrarModalEliminar = false;
                 CerrarModalEliminar();
             }
             else
             {
+
                 errorMensaje = "Error al eliminar el usuario.";
+                mostrarModalEliminar=false;
                 CerrarModalEliminar();
             }
-
+               mostrarModalEliminar=false;
                CerrarModalEliminar();
         }
            
@@ -1029,89 +1158,330 @@
         mostrarModalEliminarMultiples = false;
         StateHasChanged();
     }
-
-    private void VerInformacionIndicador(Dictionary<string, object> indicador)
+   
+private async Task VerInformacionIndicador(Dictionary<string, object> indicador)
+{
+    try
     {
-        /*ActorConsultado = indicador;
-        mostrarModalConsulta = true;
-        StateHasChanged();*/
-    }
+        cargandoimfor = true;
+        mostrarInformacion = true;
+        IndicadorInfomracion = new Dictionary<string, object>(indicador);
+        var tipo = (
+            from ti in tipoindicador
+            where $"{ObtenerValor(ti, "id")}" == $"{ObtenerValor(IndicadorInfomracion, "fkidtipoindicador")}"
+            select ObtenerValor(ti, "nombre")?.ToString()
+        ).FirstOrDefault()?? ""; 
+        
+        IndicadorInfomracion["tipoindicador"] = tipo;
+        
+        var unidad = (
+            from ti in unidadmedicion
+            where $"{ObtenerValor(ti, "id")}" == $"{ObtenerValor(IndicadorInfomracion, "fkidunidadmedicion")}"
+            select ObtenerValor(ti, "descripcion")?.ToString()
+        ).FirstOrDefault()?? ""; 
+        
+        IndicadorInfomracion["unidadmedicion"] = unidad;
 
+        var sentidoindicador = (
+            from ti in sentido
+            where $"{ObtenerValor(ti, "id")}" == $"{ObtenerValor(IndicadorInfomracion, "fkidsentido")}"
+            select ObtenerValor(ti, "nombre")?.ToString()
+        ).FirstOrDefault()?? ""; 
+        
+        IndicadorInfomracion["sentidoindicador"] = sentidoindicador;
 
+        var frecuenciaindicador = (
+            from ti in frecuencia
+            where $"{ObtenerValor(ti, "id")}" == $"{ObtenerValor(IndicadorInfomracion, "fkidfrecuencia")}"
+            select ObtenerValor(ti, "nombre")?.ToString()
+        ).FirstOrDefault()?? ""; 
+         
+        IndicadorInfomracion["frecuenciaindicador"] = frecuenciaindicador;
 
-    private string ObtenerNombreFrecuencia(Dictionary<string, object> indicador)
-    {
-        if (indicador == null) return "";
-
-
-        var lookup = frecuencia.ToDictionary(
-        item => ObtenerValor(item, "id"),
-        item => item
+        // Ejecutar todas las consultas en paralelo
+        await Task.WhenAll(
+            ObtenerInformacionARCompleta(IndicadorInfomracion),
+            ObtenerInformacionLiCompleta(IndicadorInfomracion),
+            ObtenerInformacionDesdeNumeral(IndicadorInfomracion),
+            ObtenerInformacionDesdeParagrafo(IndicadorInfomracion),
+            ObtenerResponsablesDeIndicadorAsync(IndicadorInfomracion)
         );
+    }
+    catch (Exception ex)
+    {
+        // Registrar error
+        Console.WriteLine($"Error: {ex.Message}");
+    }
+    finally
+    {
+        cargandoimfor = false;
+        StateHasChanged();
+    }
+}
 
-        if (indicador.TryGetValue("fkidfrecuencia", out var idFrecuencia))
+   private string ObtenerNombreFrecuencia(Dictionary<string, object> indicador){
+    if (indicador == null) return string.Empty;
+
+    var nombreFrecuencia = (
+        from f in frecuencia
+        where $"{ObtenerValor(f, "id")}" == $"{ObtenerValor(indicador, "fkidfrecuencia")}"
+        select ObtenerValor(f, "nombre")?.ToString()
+    ).FirstOrDefault(); 
+
+    return nombreFrecuencia ?? string.Empty;
+}
+
+
+    private string ObtenerNombresResponsables(Dictionary<string, object> indicador){
+    if (indicador == null || !indicador.TryGetValue("id", out var idIndicador))
+        return string.Empty;
+
+    var nombresResponsables = (
+        from resp in responsablesporindicador
+        where $"{ObtenerValor(resp, "fkidindicador")}" == $"{idIndicador}"
+        join act in actor on $"{ObtenerValor(resp, "fkidresponsable")}" equals $"{ObtenerValor(act, "id")}"
+        select ObtenerValor(act, "nombre")?.ToString()
+    ).Where(nombre => !string.IsNullOrEmpty(nombre));
+
+    return string.Join(", ", nombresResponsables);
+}
+
+public async Task ObtenerInformacionARCompleta(Dictionary<string, object> indicador){
+   
+    var articulosDict = articulo
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(a => ObtenerValor(a, "id"));
+
+    var seccionesDict = seccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(s => ObtenerValor(s, "id"));
+
+    var subseccionesDict = subseccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(s => ObtenerValor(s, "id"));
+
+   
+      var idArticulo = ObtenerValor(indicador, "fkidarticulo");  
+
+      var queryResult = (
+        from a in articulosDict
+        where a.Key == idArticulo  
+        join s in seccionesDict on ObtenerValor(a.Value, "fkidseccion") equals s.Key
+        join sub in subseccionesDict on ObtenerValor(a.Value, "fkidsubseccion") equals sub.Key
+        select new Dictionary<string, object>
         {
-            if (lookup.TryGetValue($"{idFrecuencia}", out var freq))
-            {
-                if (freq.TryGetValue("nombre", out var nombre))
-                {
-                    return nombre?.ToString() ?? "";
-                }
-            }
+            
+            ["articulo_nombre"] = ObtenerValor(a.Value, "nombre"),
+            ["articulo_descripcion"] = ObtenerValor(a.Value, "descripcion"),
+            ["seccion_nombre"] = ObtenerValor(s.Value, "nombre"),
+            ["subseccion_nombre"] = ObtenerValor(sub.Value, "nombre")
         }
+    ).FirstOrDefault() ?? new Dictionary<string, object>();
+   
 
-        return "";
-    }
+
+   
+       indicador["nombrearticulo"] = ObtenerValor(queryResult, "articulo_nombre");
+       indicador["descripcionarticulo"] = ObtenerValor(queryResult, "articulo_descripcion");
+       indicador["seccionarticulo"] = ObtenerValor(queryResult, "seccion_nombre");
+       indicador["subseccionarticulo"] = ObtenerValor(queryResult, "subseccion_nombre");
+}
 
 
-    private string ObtenerNombresResponsables(Dictionary<string, object> indicador)
-    {
-        if (indicador == null) return "";
+public async Task ObtenerInformacionLiCompleta(Dictionary<string, object> indicador)
+{
+   
+    var literalDict = literal
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(l => ObtenerValor(l, "id"));
 
-        // Crear diccionario lookup de responsables: clave = id indicador, valor = lista de responsables
-        var lookupResponsables = responsablesporindicador
-        .GroupBy(r => ObtenerValor(r, "fkidindicador"))
-        .ToDictionary(
-        g => g.Key,
-        g => g.ToList()
-        );
+    var articulosDict = articulo
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(a => ObtenerValor(a, "id"));
 
-        // Crear diccionario lookup de actores: clave = id, valor = diccionario de actor
-        var lookupActores = actor.ToDictionary(
-        a => ObtenerValor(a, "id"),
-        a => a
-        );
+    var seccionesDict = seccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(s => ObtenerValor(s, "id"));
 
-        if (indicador.TryGetValue("id", out var idIndicador))
+    var subseccionesDict = subseccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(su => ObtenerValor(su, "id"));
+
+    
+    var fkIdLiteral = ObtenerValor(indicador, "fkidliteral");
+
+   
+    var resultado = (
+        from l in literalDict
+        where l.Key == fkIdLiteral
+        let idArticulo = ObtenerValor(l.Value, "fkidarticulo")
+        join a in articulosDict on idArticulo equals a.Key
+        let idSeccion = ObtenerValor(a.Value, "fkidseccion")
+        join s in seccionesDict on idSeccion equals s.Key
+        let idSubseccion = ObtenerValor(a.Value, "fkidsubseccion")
+        join su in subseccionesDict on idSubseccion equals su.Key
+        select new Dictionary<string, object>
         {
-            if (lookupResponsables.TryGetValue($"{idIndicador}", out var responsables))
-            {
-                var nombres = new List<string>(responsablesporindicador.Count);
+            
+            ["literal_descripcionliteral"]   = ObtenerValor(l.Value, "descripcion"),
+            ["literal_nombrearticulo"]       = ObtenerValor(a.Value, "nombre"),
+            ["literal_descripcionarticulo"]  = ObtenerValor(a.Value, "descripcion"),
+            ["literal_nombreseccion"]        = ObtenerValor(s.Value, "nombre"),
+            ["literal_nombresubseccion"]     = ObtenerValor(su.Value, "nombre")
+        }
+    ).FirstOrDefault() ?? new Dictionary<string, object>();
 
-                foreach (var resp in responsables)
-                {
-                    if (resp.TryGetValue("fkidresponsable", out var idResponsable))
-                    {
-                        if (lookupActores.TryGetValue($"{idResponsable}", out var actor))
+
+    indicador["literal_descripcionliteral"]   = ObtenerValor(resultado, "literal_descripcionliteral");
+    indicador["literal_nombrearticulo"]       = ObtenerValor(resultado, "literal_nombrearticulo");
+    indicador["literal_descripcionarticulo"]  = ObtenerValor(resultado, "literal_descripcionarticulo");
+    indicador["literal_nombreseccion"]        = ObtenerValor(resultado, "literal_nombreseccion");
+    indicador["literal_nombresubseccion"]     = ObtenerValor(resultado, "literal_nombresubseccion");
+}
+
+public async Task ObtenerInformacionDesdeNumeral(Dictionary<string, object> indicador)
+{
+    
+    var numeralesDict = numeral
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(n => ObtenerValor(n, "id"));
+
+    var literalDict = literal
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(l => ObtenerValor(l, "id"));
+
+    var articulosDict = articulo
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(a => ObtenerValor(a, "id"));
+
+    var seccionesDict = seccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(s => ObtenerValor(s, "id"));
+
+    var subseccionesDict = subseccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(su => ObtenerValor(su, "id"));
+
+   
+    var idNumeral = ObtenerValor(indicador, "fkidnumeral");
+
+   
+    var resultado = (
+        from n in numeralesDict
+        where n.Key == idNumeral
+        let idLiteral = ObtenerValor(n.Value, "fkidliteral")
+        join l in literalDict on idLiteral equals l.Key
+        let idArticulo = ObtenerValor(l.Value, "fkidarticulo")
+        join a in articulosDict on idArticulo equals a.Key
+        let idSeccion = ObtenerValor(a.Value, "fkidseccion")
+        join s in seccionesDict on idSeccion equals s.Key
+        let idSubseccion = ObtenerValor(a.Value, "fkidsubseccion")
+        join su in subseccionesDict on idSubseccion equals su.Key
+        select new Dictionary<string, object>
+        {
+            ["descripcion_numeral"]          = ObtenerValor(n.Value, "descripcion"),
+            ["descripcion_literal_numeral"]  = ObtenerValor(l.Value, "descripcion"),
+            ["nombre_articulo_numeral"]      = ObtenerValor(a.Value, "nombre"),
+            ["descripcion_articulo_numeral"] = ObtenerValor(a.Value, "descripcion"),
+            ["nombre_seccion_numeral"]       = ObtenerValor(s.Value, "nombre"),
+            ["nombre_subseccion_numeral"]    = ObtenerValor(su.Value, "nombre")
+        }
+    )
+    .FirstOrDefault()
+    ?? new Dictionary<string, object>();
+
+    
+    indicador["descripcion_numeral"]          = ObtenerValor(resultado, "descripcion_numeral");
+    indicador["descripcion_literal_numeral"]  = ObtenerValor(resultado, "descripcion_literal_numeral");
+    indicador["nombre_articulo_numeral"]      = ObtenerValor(resultado, "nombre_articulo_numeral");
+    indicador["descripcion_articulo_numeral"] = ObtenerValor(resultado, "descripcion_articulo_numeral");
+    indicador["nombre_seccion_numeral"]       = ObtenerValor(resultado, "nombre_seccion_numeral");
+    indicador["nombre_subseccion_numeral"]    = ObtenerValor(resultado, "nombre_subseccion_numeral");
+}
+
+public async Task ObtenerInformacionDesdeParagrafo(Dictionary<string, object> indicador)
+{
+    
+    var paragrafoDict = paragrafo
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(p => ObtenerValor(p, "id"));
+
+    var articulosDict = articulo
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(a => ObtenerValor(a, "id"));
+
+    var seccionesDict = seccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(s => ObtenerValor(s, "id"));
+
+    var subseccionesDict = subseccion
+        .OfType<Dictionary<string, object>>()
+        .ToDictionary(su => ObtenerValor(su, "id"));
+
+    
+    var idParagrafo = ObtenerValor(indicador, "fkidparagrafo");
+
+   
+    var resultado = (
+        from p in paragrafoDict
+        where p.Key == idParagrafo
+        let idArticulo = ObtenerValor(p.Value, "fkidarticulo")
+        join a in articulosDict on idArticulo equals a.Key
+        let idSeccion = ObtenerValor(a.Value, "fkidseccion")
+        join s in seccionesDict on idSeccion equals s.Key
+        let idSubseccion = ObtenerValor(a.Value, "fkidsubseccion")
+        join su in subseccionesDict on idSubseccion equals su.Key
+        select new Dictionary<string, object>
+        {
+            ["descripcion_paragrafo"]         = ObtenerValor(p.Value, "descripcion"),
+            ["nombre_articulo_paragrafo"]     = ObtenerValor(a.Value, "nombre"),
+            ["descripcion_articulo_paragrafo"]= ObtenerValor(a.Value, "descripcion"),
+            ["nombre_seccion_paragrafo"]      = ObtenerValor(s.Value, "nombre"),
+            ["nombre_subseccion_paragrafo"]   = ObtenerValor(su.Value, "nombre")
+        }
+    )
+    .FirstOrDefault()
+    ?? new Dictionary<string, object>();
+
+    
+    indicador["descripcion_paragrafo"]          = ObtenerValor(resultado, "descripcion_paragrafo");
+    indicador["nombre_articulo_paragrafo"]      = ObtenerValor(resultado, "nombre_articulo_paragrafo");
+    indicador["descripcion_articulo_paragrafo"] = ObtenerValor(resultado, "descripcion_articulo_paragrafo");
+    indicador["nombre_seccion_paragrafo"]       = ObtenerValor(resultado, "nombre_seccion_paragrafo");
+    indicador["nombre_subseccion_paragrafo"]    = ObtenerValor(resultado, "nombre_subseccion_paragrafo");
+}
+
+  
+public async Task ObtenerResponsablesDeIndicadorAsync(Dictionary<string, object> indicador)
+{
+    try
+    {
+        var responsables = await Task.Run(() => 
+        {
+            var query = from res in responsablesporindicador
+                        join a in actor on ObtenerValor(res, "fkidresponsable") equals ObtenerValor(a, "id")
+                        join ti in tipoactor on ObtenerValor(a, "fkidtipoactor") equals ObtenerValor(ti, "id")
+                        where ObtenerValor(res, "fkidindicador") == ObtenerValor(indicador, "id")
+                        select new Dictionary<string, object>
                         {
-                            if (actor.TryGetValue("nombre", out var nombre))
-                            {
-                                nombres.Add(nombre?.ToString() ?? "");
-                            }
-                        }
-                    }
-                }
+                            ["fechaasignacion_responsable"] = ObtenerValor(res, "fechaasignacion"),
+                            ["nombre_actor_responsable"] = ObtenerValor(a, "nombre"),
+                            ["nombre_tipoactor_responsable"] = ObtenerValor(ti, "nombre")
+                        };
 
-                return string.Join(", ", nombres);
-            }
-        }
+            return query.ToList();
+        });
 
-        return "";
+        indicador["responsables_list"] = responsables ?? new List<Dictionary<string, object>>();
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error cargando responsables: {ex.Message}");
+        indicador["responsables_list"] = new List<Dictionary<string, object>>();
+    }
+} 
 
-
-
-    private void ToggleActor(string id)
+private void ToggleActor(string id)
     {
         var actorSeleccionado = actor.FirstOrDefault(a => ObtenerValor(a, "id") == id);
         if (actorSeleccionado != null)

@@ -16,6 +16,8 @@ namespace FrontBlazor.Services
         // Inyectar servicio para manejar la navegación
         [Inject] protected NavigationManager Navegacion { get; set; } = default!;
 
+        public List<string> RolesUsuario { get; private set; } = new();
+
         // Controlar si el acceso está permitido
         private bool accesoPermitido = false;
 
@@ -64,7 +66,7 @@ namespace FrontBlazor.Services
                     Navegacion.NavigateTo("/login", true);
                     return;
                 }
-                
+
 
                 // Obtener todas las rutas permitidas desde sessionStorage
                 var rutasPermitidas = await InteropJS.InvokeAsync<List<string>>("eval", @"
@@ -83,6 +85,21 @@ namespace FrontBlazor.Services
                     return;
                 }
 
+                var rolesDesdeStorage = await InteropJS.InvokeAsync<List<string>>("eval", @"
+                     Object.keys(sessionStorage)
+                     .filter(k => k.startsWith('rol_'))
+                     .map(k => sessionStorage.getItem(k))
+                ") ?? new List<string>();
+                 
+                 if (!rolesDesdeStorage.Any())
+                {
+                    await InteropJS.InvokeVoidAsync("alert", "No tienes Roles");
+                    Navegacion.NavigateTo("/", true);
+                    return;
+                }
+
+                RolesUsuario = rolesDesdeStorage;
+
                 // Permitir el acceso si todas las validaciones pasan
                 accesoPermitido = true;
                 StateHasChanged();
@@ -95,5 +112,9 @@ namespace FrontBlazor.Services
                 Navegacion.NavigateTo("/", true);
             }
         }
+
+
+
+
     }
 }

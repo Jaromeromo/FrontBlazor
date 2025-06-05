@@ -18,18 +18,21 @@
                         <button class="btn btn-info btn-sm" @onclick="() => mostrarModalConsulta = true">
                             <i class="material-icons">&#xE8B6;</i> <span>Consultar</span>
                         </button>
-
+                         @if(RolesUsuario.Contains("admin")){
                         <button class="btn btn-danger btn-sm" @onclick="MostrarModalEliminarMultiples">
                             <i class="material-icons">&#xE15C;</i> <span>Eliminar</span>
                         </button>
-
+                        }
+                        @if(RolesUsuario.Contains("admin")){
                         <button class="btn btn-success btn-sm" @onclick="AbrirModalGuardar">
                             <i class="material-icons">&#xE147;</i> <span>Agregar</span>
                         </button>
-
+                        }
+                         @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                         <button class="btn btn-info btn-sm" @onclick="() => EditarRelacionSeleccionada()">
                             <i class="material-icons">&#xE254;</i> <span>Editar Seleccionado</span>
                         </button>
+                        }
                     </div>
                 </div>
             </div>
@@ -47,12 +50,14 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
+                             @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                             <th>
                                 <span class="custom-checkbox">
                                     <input type="checkbox" @bind="@seleccionarTodos">
                                     <label></label>
                                 </span>
                             </th>
+                            }
                             <th>ID Fuente</th>
                             <th>ID Indicador</th>
                             <th>Acciones</th>
@@ -62,22 +67,28 @@
                         @foreach (var relacion in relaciones)
                         {
                             <tr>
+                                 @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                                 <td>
                                     <span class="custom-checkbox">
                                         <input type="checkbox" @bind="@relacionesSeleccionadas[relacion]">
                                         <label></label>
                                     </span>
                                 </td>
+                                }
                                 <td>@ObtenerValor(relacion, "fkidfuente")</td>
                                 <td>@ObtenerValor(relacion, "fkidindicador")</td>
                                 <td>
+                                     @if(RolesUsuario.Contains("admin") ||RolesUsuario.Contains("Validador") ){
                                     <a href="#" class="edit" @onclick="() => EditarRelacion(relacion)" @onclick:preventDefault>
                                         <i class="material-icons" title="Editar">&#xE254;</i>
                                     </a>
+                                    }
+                                    @if(RolesUsuario.Contains("admin")){
                                     <a href="#" class="delete" @onclick="() => EliminarRelacion(relacion)"
                                         @onclick:preventDefault>
                                         <i class="material-icons" title="Eliminar">&#xE872;</i>
                                     </a>
+                                    }
                                 </td>
                             </tr>
                         }
